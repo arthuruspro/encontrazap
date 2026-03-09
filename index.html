@@ -1507,7 +1507,7 @@
             </div>
             <div class="feature-item">
               <span class="feature-check">&#10003;</span>
-              <span>Buscas extras por R$4,90</span>
+              <span>Buscas extras por R$1,90</span>
             </div>
           </div>
 
@@ -1700,7 +1700,7 @@
         </div>
 
         <div class="modal-price-line">
-          <span id="extras-calc">1 &times; R$4,90</span>
+          <span id="extras-calc">1 &times; R$1,90</span>
           <span>=</span>
           <span class="modal-total" id="extras-total">R$ 4,90</span>
         </div>
@@ -1751,7 +1751,7 @@
     var DEFAULT_TEMPLATE = 'Ol\u00e1, tudo bem? Vi a {empresa} no Google e gostaria de conversar sobre uma oportunidade. Posso te explicar em 2 minutos?';
     var DEFAULT_FREE_SEARCHES = 2;
     var PAID_MONTHLY_SEARCHES = 20;
-    var EXTRA_PRICE = 4.90;
+    var EXTRA_PRICE = 1.90;
 
     // Detectar cidade do usuário por IP (pra placeholder)
     (function() {
@@ -2796,7 +2796,7 @@
       document.getElementById('qty-number').textContent = extraQty;
       document.getElementById('qty-label').textContent = extraQty === 1 ? 'busca' : 'buscas';
       const total = (extraQty * EXTRA_PRICE).toFixed(2).replace('.', ',');
-      document.getElementById('extras-calc').textContent = extraQty + ' \u00d7 R$4,90';
+      document.getElementById('extras-calc').textContent = extraQty + ' \u00d7 R$1,90';
       document.getElementById('extras-total').textContent = 'R$ ' + total;
       document.getElementById('btn-buy-extras').textContent = 'Comprar ' + extraQty + ' busca' + (extraQty !== 1 ? 's' : '') + ' extra' + (extraQty !== 1 ? 's' : '');
     }

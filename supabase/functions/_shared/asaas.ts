@@ -63,8 +63,10 @@ export async function createSubscription(customerId: string): Promise<{
   tomorrow.setDate(tomorrow.getDate() + 1);
   const startDate = tomorrow.toISOString().split('T')[0];
 
-  // Gerar contractId único pra essa autorização
-  const contractId = `encontrazap-${customerId}-${Date.now()}`;
+  // Gerar contractId único pra essa autorização (máx 35 chars)
+  const shortId = Date.now().toString(36);
+  const custShort = customerId.replace('cus_', '').slice(0, 12);
+  const contractId = `ez-${custShort}-${shortId}`;
 
   const res = await fetch(`${ASAAS_BASE}/pix/automatic/authorizations`, {
     method: 'POST',
@@ -100,7 +102,7 @@ export async function createPixCharge(customerId: string, quantity: number): Pro
   encodedImage: string;
   payload: string;
 }> {
-  const value = quantity * 4.90;
+  const value = quantity * 1.90;
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   const dueDate = tomorrow.toISOString().split('T')[0];

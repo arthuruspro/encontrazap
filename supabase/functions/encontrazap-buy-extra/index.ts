@@ -60,7 +60,7 @@ serve(async (req) => {
     await db.from('payments').insert({
       user_id: user.id,
       type: 'extra_searches',
-      amount: quantity * 4.90,
+      amount: quantity * 1.90,
       quantity,
       asaas_payment_id: result.paymentId,
       status: 'pending',
