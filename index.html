@@ -1396,6 +1396,10 @@
       <div class="loading-container">
         <p class="loading-title" id="loading-title">Buscando empresas...</p>
         <div class="loading-progress-bar"><div class="loading-progress-fill" id="loading-progress"></div></div>
+        <div class="loading-counter" id="loading-counter" style="display:none;text-align:center;margin:4px 0;">
+          <span style="font-size:28px;font-weight:800;color:var(--primary);" id="loading-count">0</span>
+          <span style="font-size:14px;color:var(--text-muted);display:block;">empresas encontradas</span>
+        </div>
         <div class="loading-steps">
           <div class="loading-step" id="lstep1"><div class="loading-step-icon"></div><div class="loading-step-text">Pesquisando na regi&atilde;o...</div></div>
           <div class="loading-step" id="lstep2"><div class="loading-step-icon"></div><div class="loading-step-text">Coletando dados das empresas...</div></div>
@@ -1750,6 +1754,20 @@
     var PAID_MONTHLY_SEARCHES = 20;
     var EXTRA_PRICE = 4.90;
 
+    // Detectar cidade do usuário por IP (pra placeholder)
+    (function() {
+      fetch('https://ipapi.co/json/')
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+          if (d.city && d.region_code) {
+            var loc = d.city + ', ' + d.region_code;
+            var el = document.getElementById('input-location');
+            if (el && !el.value) el.placeholder = 'Ex: ' + loc;
+          }
+        })
+        .catch(function() {});
+    })();
+
     // =============================================
     // SUPABASE CLIENT
     // =============================================
@@ -1913,30 +1931,34 @@
     }
 
     var loadingSteps = [
-      { delay: 0, doneDelay: 4000, progress: 15 },
-      { delay: 4000, doneDelay: 10000, progress: 40 },
-      { delay: 10000, doneDelay: 18000, progress: 70 },
-      { delay: 18000, doneDelay: 24000, progress: 95 }
+      { delay: 0, doneDelay: 3000, progress: 10 },
+      { delay: 3000, doneDelay: 8000, progress: 35 },
+      { delay: 8000, doneDelay: 14000, progress: 65 },
+      { delay: 14000, doneDelay: 19000, progress: 90 }
     ];
     var loadingTimeouts = [];
+    var counterInterval = null;
 
     function startLoadingHints() {
       // Reset all steps
       for (var i = 1; i <= 4; i++) {
         var el = document.getElementById('lstep' + i);
         el.classList.remove('active', 'done');
+        // Reset text
+        var texts = ['Pesquisando na regi\u00e3o...', 'Coletando dados das empresas...', 'Filtrando empresas com WhatsApp...', 'Organizando sua lista de leads...'];
+        el.querySelector('.loading-step-text').textContent = texts[i - 1];
       }
       document.getElementById('loading-progress').style.width = '0%';
       document.getElementById('loading-hint').textContent = 'Isso pode levar alguns segundos';
+      document.getElementById('loading-counter').style.display = 'none';
+      document.getElementById('loading-count').textContent = '0';
 
       loadingSteps.forEach(function(step, idx) {
         var stepNum = idx + 1;
-        // Activate step
         loadingTimeouts.push(setTimeout(function() {
           document.getElementById('lstep' + stepNum).classList.add('active');
           document.getElementById('loading-progress').style.width = step.progress + '%';
         }, step.delay));
-        // Complete step
         loadingTimeouts.push(setTimeout(function() {
           var el = document.getElementById('lstep' + stepNum);
           el.classList.remove('active');
@@ -1945,22 +1967,51 @@
         }, step.doneDelay));
       });
 
-      // Hint updates
+      // Mostrar contador de empresas encontradas (animado)
       loadingTimeouts.push(setTimeout(function() {
-        document.getElementById('loading-hint').textContent = 'Quanto mais empresas, melhor pra voc\u00ea!';
-      }, 8000));
+        document.getElementById('loading-counter').style.display = 'block';
+        var count = 0;
+        var target = 30 + Math.floor(Math.random() * 15); // 30-44
+        counterInterval = setInterval(function() {
+          count += Math.ceil(Math.random() * 3);
+          if (count >= target) { count = target; clearInterval(counterInterval); counterInterval = null; }
+          document.getElementById('loading-count').textContent = count;
+        }, 400);
+      }, 5000));
+
+      // Hints rotativos
+      var hints = [
+        { t: 6000, msg: 'Quanto mais empresas, melhor pra voc\u00ea!' },
+        { t: 12000, msg: 'Filtrando s\u00f3 as que t\u00eam WhatsApp...' },
+        { t: 17000, msg: 'Ordenando pelos melhores avaliados...' },
+        { t: 21000, msg: 'Estamos quase l\u00e1!' },
+        { t: 26000, msg: 'S\u00f3 mais um instante...' },
+        { t: 32000, msg: 'Essa regi\u00e3o tem bastante resultado!' },
+        { t: 38000, msg: 'Quase pronto, aguarde...' }
+      ];
+      hints.forEach(function(h) {
+        loadingTimeouts.push(setTimeout(function() {
+          var el = document.getElementById('loading-hint');
+          el.style.opacity = '0';
+          setTimeout(function() { el.textContent = h.msg; el.style.opacity = '1'; }, 250);
+        }, h.t));
+      });
+
+      // Depois dos 4 steps, manter progresso pulsando entre 90-98%
       loadingTimeouts.push(setTimeout(function() {
-        document.getElementById('loading-hint').textContent = 'Estamos quase l\u00e1...';
-      }, 16000));
-      loadingTimeouts.push(setTimeout(function() {
-        document.getElementById('loading-hint').textContent = 'S\u00f3 mais alguns segundos...';
-      }, 22000));
+        var pulse = true;
+        var pulseInt = setInterval(function() {
+          document.getElementById('loading-progress').style.width = pulse ? '96%' : '92%';
+          pulse = !pulse;
+        }, 1500);
+        loadingTimeouts.push(pulseInt);
+      }, 20000));
     }
 
     function stopLoadingHints() {
-      loadingTimeouts.forEach(function(t) { clearTimeout(t); });
+      loadingTimeouts.forEach(function(t) { clearTimeout(t); clearInterval(t); });
       loadingTimeouts = [];
-      // Set progress to 100% when done
+      if (counterInterval) { clearInterval(counterInterval); counterInterval = null; }
       document.getElementById('loading-progress').style.width = '100%';
     }
 
