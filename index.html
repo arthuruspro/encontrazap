@@ -2829,17 +2829,40 @@
       if (!currentUser) return;
       // Garantir que o session está atualizado antes de buscar
       try {
-        await sb.auth.refreshSession();
+        var refreshResult = await sb.auth.refreshSession();
+        console.log('[EncontraZap] refreshSession result:', refreshResult.data?.session ? 'OK' : 'no session', refreshResult.error);
       } catch (e) {
         console.warn('[EncontraZap] refreshSession before profile fetch:', e);
       }
-      const { data, error } = await sb.from('users').select('*').eq('id', currentUser.id).single();
+      // Tentar buscar o perfil
+      var { data, error } = await sb.from('users').select('*').eq('id', currentUser.id).single();
       console.log('[EncontraZap] fetchUserProfile:', { data, error, plan: data?.plan });
+
+      // Se RLS bloqueou (406/PGRST116) ou deu erro, tentar sem RLS via anon headers diretos
+      if (error && !data) {
+        console.warn('[EncontraZap] Profile fetch failed, trying with fresh session...');
+        // Pegar sessão fresca e tentar de novo
+        var { data: sessData } = await sb.auth.getSession();
+        if (sessData?.session) {
+          var retryResp = await fetch(SUPABASE_URL + '/rest/v1/users?id=eq.' + currentUser.id + '&select=*', {
+            headers: {
+              'apikey': SUPABASE_ANON_KEY,
+              'Authorization': 'Bearer ' + sessData.session.access_token,
+              'Accept': 'application/vnd.pgrst.object+json'
+            }
+          });
+          if (retryResp.ok) {
+            data = await retryResp.json();
+            error = null;
+            console.log('[EncontraZap] Retry fetch OK:', { plan: data?.plan });
+          }
+        }
+      }
+
       if (data) {
         userProfile = data;
       } else if (error) {
         console.error('[EncontraZap] Profile fetch error:', error);
-        // Se deu erro de permissão, não criar perfil novo — pode ser RLS
       } else {
         // Profile doesn't exist yet, create
         await initUserProfile();
