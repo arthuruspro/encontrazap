@@ -1973,7 +1973,7 @@
         showScreen('results');
       } catch (err) {
         console.error('Search error:', err);
-        alert('Erro ao buscar leads. Tente novamente.');
+        alert('Erro ao encontrar leads: ' + (err.message || 'Tente novamente.'));
         showScreen('search');
       }
     }
