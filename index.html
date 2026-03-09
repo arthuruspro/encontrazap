@@ -1898,19 +1898,17 @@
     }
 
     function getContactedSet() {
-      const key = 'ez_contacted_' + getSearchHash();
       try {
-        return new Set(JSON.parse(localStorage.getItem(key) || '[]'));
+        return new Set(JSON.parse(localStorage.getItem('ez_contacted_phones') || '[]'));
       } catch {
         return new Set();
       }
     }
 
-    function markContacted(index) {
-      const key = 'ez_contacted_' + getSearchHash();
+    function markContacted(phone) {
       const set = getContactedSet();
-      set.add(index);
-      localStorage.setItem(key, JSON.stringify([...set]));
+      set.add(phone);
+      localStorage.setItem('ez_contacted_phones', JSON.stringify([...set]));
     }
 
     // =============================================
@@ -1930,12 +1928,12 @@
     }
 
     var loadingSteps = [
-      { delay: 0, doneDelay: 3000, progress: 8 },
-      { delay: 3000, doneDelay: 8000, progress: 22 },
-      { delay: 8000, doneDelay: 14000, progress: 45 },
-      { delay: 14000, doneDelay: 19000, progress: 65 },
-      { delay: 19000, doneDelay: 24000, progress: 82 },
-      { delay: 24000, doneDelay: 28000, progress: 95 }
+      { delay: 0, doneDelay: 2400, progress: 8 },
+      { delay: 2400, doneDelay: 6400, progress: 22 },
+      { delay: 6400, doneDelay: 11200, progress: 45 },
+      { delay: 11200, doneDelay: 15200, progress: 65 },
+      { delay: 15200, doneDelay: 19200, progress: 82 },
+      { delay: 19200, doneDelay: 22400, progress: 95 }
     ];
     var loadingTimeouts = [];
 
@@ -1964,11 +1962,11 @@
       });
 
       var hints = [
-        { t: 5000, msg: 'Analisando resultados do Google Maps...' },
-        { t: 11000, msg: 'Verificando n\u00fameros de celular...' },
-        { t: 17000, msg: 'Estamos quase l\u00e1!' },
-        { t: 23000, msg: 'S\u00f3 mais um instante...' },
-        { t: 30000, msg: 'Quase pronto, aguarde...' }
+        { t: 4000, msg: 'Analisando resultados do Google Maps...' },
+        { t: 9000, msg: 'Verificando n\u00fameros de celular...' },
+        { t: 14000, msg: 'Estamos quase l\u00e1!' },
+        { t: 18000, msg: 'S\u00f3 mais um instante...' },
+        { t: 24000, msg: 'Quase pronto, aguarde...' }
       ];
       hints.forEach(function(h) {
         loadingTimeouts.push(setTimeout(function() {
@@ -1986,7 +1984,7 @@
           pulse = !pulse;
         }, 1200);
         loadingTimeouts.push(pulseInt);
-      }, 29000));
+      }, 23000));
     }
 
     function stopLoadingHints() {
@@ -2130,7 +2128,8 @@
       const contacted = getContactedSet();
 
       leads.forEach((lead, i) => {
-        const isContacted = contacted.has(i);
+        const leadPhone = (lead.phone || '').replace(/\D/g, '');
+        const isContacted = contacted.has(leadPhone);
         const item = document.createElement('div');
         item.className = 'lead-item' + (isContacted ? ' contacted' : '') + (hideContacted && isContacted ? ' hidden' : '');
         item.id = 'lead-' + i;
@@ -2170,8 +2169,9 @@
     function checkAllContacted() {
       const contacted = getContactedSet();
       const banner = document.getElementById('all-contacted-banner');
-      if (currentLeads.length > 0 && contacted.size >= currentLeads.length) {
-        banner.style.display = 'block';
+      if (currentLeads.length > 0) {
+        const allDone = currentLeads.every(function(l) { return contacted.has((l.phone || '').replace(/\D/g, '')); });
+        banner.style.display = allDone ? 'block' : 'none';
       } else {
         banner.style.display = 'none';
       }
@@ -2181,7 +2181,7 @@
     // WHATSAPP CLICK
     // =============================================
     function handleWhatsAppClick(index, phone, name) {
-      markContacted(index);
+      markContacted(phone);
 
       const item = document.getElementById('lead-' + index);
       if (item) {
@@ -2210,9 +2210,10 @@
       sw.classList.toggle('on', hideContacted);
 
       const contacted = getContactedSet();
-      currentLeads.forEach((_, i) => {
+      currentLeads.forEach((lead, i) => {
         const item = document.getElementById('lead-' + i);
-        if (item && contacted.has(i)) {
+        const phone = (lead.phone || '').replace(/\D/g, '');
+        if (item && contacted.has(phone)) {
           item.classList.toggle('hidden', hideContacted);
         }
       });
