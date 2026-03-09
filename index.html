@@ -1935,9 +1935,9 @@
           'apikey': SUPABASE_ANON_KEY
         };
 
-        // Add auth header if logged in
+        // Add auth header if logged in (refresh token to avoid 401)
         if (currentUser) {
-          const { data: { session } } = await sb.auth.getSession();
+          const { data: { session } } = await sb.auth.refreshSession();
           if (session) {
             headers['Authorization'] = 'Bearer ' + session.access_token;
           }
