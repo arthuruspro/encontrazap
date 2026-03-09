@@ -1,0 +1,2279 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>EncontraZap - Encontre clientes. Chame no Zap.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --primary: #25D366;
+      --primary-dark: #128C7E;
+      --bg: #fafafa;
+      --text: #111827;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+      --danger: #dc2626;
+      --success: #16a34a;
+      --radius: 14px;
+      --radius-lg: 16px;
+    }
+
+    html {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 16px;
+      color: var(--text);
+      background: var(--bg);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      min-height: 100dvh;
+      display: flex;
+      justify-content: center;
+      background: var(--bg);
+    }
+
+    .app {
+      width: 100%;
+      max-width: 480px;
+      min-height: 100dvh;
+      background: #fff;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    .screen {
+      display: none;
+      min-height: 100dvh;
+      flex-direction: column;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    /* ---- HEADER ---- */
+    .header {
+      display: flex;
+      align-items: center;
+      padding: 16px 20px;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: #fff;
+      z-index: 10;
+    }
+
+    .header-back {
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: var(--bg);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .header-back svg {
+      width: 20px;
+      height: 20px;
+      color: var(--text);
+    }
+
+    .header-title {
+      font-size: 17px;
+      font-weight: 700;
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .header-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .header-action {
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: var(--bg);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* ---- INPUTS ---- */
+    .input-group {
+      margin-bottom: 14px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .input-field {
+      width: 100%;
+      height: 50px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0 16px;
+      font-size: 15px;
+      font-family: inherit;
+      color: var(--text);
+      background: #fff;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+
+    .input-field:focus {
+      border-color: var(--primary);
+    }
+
+    .input-field::placeholder {
+      color: #9ca3af;
+    }
+
+    textarea.input-field {
+      height: 130px;
+      padding: 14px 16px;
+      resize: none;
+      line-height: 1.5;
+    }
+
+    /* ---- BUTTONS ---- */
+    .btn {
+      width: 100%;
+      height: 52px;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 16px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: opacity 0.2s, transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-primary:disabled {
+      background: #d1d5db;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: var(--bg);
+      color: var(--text);
+      border: 2px solid var(--border);
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    /* ---- BADGE ---- */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge-green {
+      background: #dcfce7;
+      color: var(--success);
+    }
+
+    .badge-yellow {
+      background: #fef9c3;
+      color: #a16207;
+    }
+
+    .badge-red {
+      background: #fee2e2;
+      color: var(--danger);
+    }
+
+    /* ---- SEARCH SCREEN ---- */
+    .search-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 24px 24px;
+    }
+
+    .logo-circle {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 14px rgba(37, 211, 102, 0.3);
+    }
+
+    .search-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .search-tagline {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+    }
+
+    .search-form {
+      width: 100%;
+    }
+
+    .search-footer {
+      margin-top: auto;
+      padding: 16px 0;
+      text-align: center;
+    }
+
+    .search-footer-text {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .search-badge-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .history-link {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--primary-dark);
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: inherit;
+      padding: 4px 0;
+    }
+
+    /* ---- LOADING SCREEN ---- */
+    .loading-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .pulsing-dots::after {
+      content: '';
+      animation: dots 1.5s steps(4, end) infinite;
+    }
+
+    @keyframes dots {
+      0% { content: ''; }
+      25% { content: '.'; }
+      50% { content: '..'; }
+      75% { content: '...'; }
+    }
+
+    /* ---- RESULTS SCREEN ---- */
+    .results-screen {
+      padding-bottom: 80px;
+    }
+
+    .template-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 12px 16px;
+      padding: 10px 14px;
+      background: #dcfce7;
+      border-radius: 10px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .template-bar-icon {
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .template-bar-text {
+      flex: 1;
+      font-size: 13px;
+      color: var(--primary-dark);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .template-bar-hint {
+      font-size: 11px;
+      color: var(--primary-dark);
+      opacity: 0.7;
+      flex-shrink: 0;
+    }
+
+    .results-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 16px;
+    }
+
+    .toggle-contacted {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      padding: 4px 0;
+    }
+
+    .toggle-switch {
+      width: 40px;
+      height: 22px;
+      background: var(--border);
+      border-radius: 11px;
+      position: relative;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+
+    .toggle-switch.on {
+      background: var(--primary);
+    }
+
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 18px;
+      height: 18px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    }
+
+    .toggle-switch.on::after {
+      transform: translateX(18px);
+    }
+
+    .leads-list {
+      padding: 0 16px;
+    }
+
+    .lead-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      transition: opacity 0.3s, background 0.3s;
+    }
+
+    .lead-item.contacted {
+      background: #f0fdf4;
+      opacity: 0.7;
+      margin: 0 -16px;
+      padding: 14px 16px;
+      border-radius: 10px;
+    }
+
+    .lead-item.hidden {
+      display: none;
+    }
+
+    .lead-index {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .lead-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .lead-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 3px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .lead-contacted-check {
+      color: var(--success);
+      font-size: 14px;
+      display: none;
+    }
+
+    .lead-item.contacted .lead-contacted-check {
+      display: inline;
+    }
+
+    .lead-meta {
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .lead-rating {
+      font-weight: 600;
+    }
+
+    .lead-rating.high { color: var(--success); }
+    .lead-rating.mid { color: var(--text-muted); }
+    .lead-rating.low { color: var(--danger); }
+
+    .lead-wa-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      flex-shrink: 0;
+      transition: transform 0.15s;
+      box-shadow: 0 2px 8px rgba(37, 211, 102, 0.35);
+    }
+
+    .lead-wa-btn:active {
+      transform: scale(0.92);
+    }
+
+    .lead-item.contacted .lead-wa-btn {
+      background: #86efac;
+      box-shadow: none;
+    }
+
+    .lead-wa-btn svg {
+      width: 22px;
+      height: 22px;
+      fill: #fff;
+    }
+
+    .results-bottom {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      background: #fff;
+      border-top: 1px solid var(--border);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 10;
+    }
+
+    .results-progress-text {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    .results-progress-bar {
+      flex: 1;
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .results-progress-fill {
+      height: 100%;
+      background: var(--primary);
+      border-radius: 3px;
+      transition: width 0.3s;
+    }
+
+    .all-contacted-banner {
+      text-align: center;
+      padding: 24px 16px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      display: none;
+    }
+
+    /* ---- TEMPLATE SCREEN ---- */
+    .template-container {
+      flex: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tip-box {
+      background: #fefce8;
+      border: 1px solid #fde68a;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 13px;
+      color: #92400e;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .preview-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-top: 16px;
+      margin-bottom: 8px;
+    }
+
+    .wa-bubble {
+      background: #dcf8c6;
+      border-radius: 0 14px 14px 14px;
+      padding: 12px 16px;
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--text);
+      max-width: 85%;
+      word-break: break-word;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    }
+
+    .template-actions {
+      margin-top: auto;
+      padding-top: 20px;
+    }
+
+    /* ---- LIMIT SCREEN ---- */
+    .limit-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 24px 24px;
+      text-align: center;
+    }
+
+    .limit-icon {
+      font-size: 56px;
+      margin-bottom: 16px;
+    }
+
+    .limit-title {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .limit-subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    .limit-price {
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+
+    .limit-price-period {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .features-list {
+      width: 100%;
+      text-align: left;
+      margin-bottom: 32px;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    .feature-check {
+      width: 22px;
+      height: 22px;
+      background: #dcfce7;
+      color: var(--success);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .limit-actions {
+      width: 100%;
+      margin-top: auto;
+    }
+
+    /* ---- AUTH SCREEN ---- */
+    .auth-container {
+      flex: 1;
+      padding: 20px;
+    }
+
+    .auth-tabs {
+      display: flex;
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 24px;
+    }
+
+    .auth-tab {
+      flex: 1;
+      height: 40px;
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .auth-tab.active {
+      background: #fff;
+      color: var(--text);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .auth-error {
+      background: #fee2e2;
+      color: var(--danger);
+      font-size: 13px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .auth-error.visible {
+      display: block;
+    }
+
+    .auth-actions {
+      margin-top: 24px;
+    }
+
+    /* ---- SUBSCRIBE SCREEN ---- */
+    .subscribe-container {
+      flex: 1;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .subscribe-title {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .subscribe-price {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 24px;
+    }
+
+    .qr-container {
+      background: #fff;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .qr-container.visible {
+      display: block;
+    }
+
+    .qr-container img {
+      width: 200px;
+      height: 200px;
+      border-radius: 8px;
+    }
+
+    .pix-copy-btn {
+      width: 100%;
+      height: 44px;
+      border: 2px solid var(--primary);
+      background: #fff;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--primary-dark);
+      cursor: pointer;
+      margin-top: 12px;
+      transition: background 0.2s;
+    }
+
+    .pix-copy-btn:active {
+      background: #dcfce7;
+    }
+
+    .pix-waiting {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--primary-dark);
+      margin: 16px 0;
+      display: none;
+    }
+
+    .pix-waiting.visible {
+      display: block;
+    }
+
+    .pix-steps {
+      width: 100%;
+      text-align: left;
+      margin-top: 20px;
+      display: none;
+    }
+
+    .pix-steps.visible {
+      display: block;
+    }
+
+    .pix-steps-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .pix-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 10px;
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .pix-step-num {
+      width: 22px;
+      height: 22px;
+      background: var(--bg);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+      flex-shrink: 0;
+    }
+
+    /* ---- HISTORY SCREEN ---- */
+    .history-container {
+      flex: 1;
+      padding: 0 16px 24px;
+    }
+
+    .history-empty {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .history-item:active {
+      opacity: 0.7;
+    }
+
+    .history-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #dcfce7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .history-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .history-category {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .history-location {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .history-right {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .history-leads {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--primary-dark);
+    }
+
+    .history-date {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* ---- BUY EXTRAS MODAL ---- */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 100;
+      animation: fadeIn 0.2s;
+    }
+
+    .modal-overlay.visible {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal-sheet {
+      background: #fff;
+      width: 100%;
+      max-width: 480px;
+      border-radius: 20px 20px 0 0;
+      padding: 24px;
+      animation: slideUp 0.3s ease-out;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .modal-handle {
+      width: 40px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      margin: 0 auto 20px;
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .modal-subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .qty-selector {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 20px;
+    }
+
+    .qty-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: #fff;
+      font-size: 22px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+      font-family: inherit;
+    }
+
+    .qty-btn:active {
+      background: var(--bg);
+    }
+
+    .qty-value {
+      text-align: center;
+    }
+
+    .qty-number {
+      font-size: 40px;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .qty-label {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .modal-price-line {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .modal-total {
+      font-weight: 700;
+      color: var(--text);
+      font-size: 16px;
+    }
+
+    .modal-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* ---- PAYMENT SUCCESS ANIMATION ---- */
+    .payment-success {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 32px;
+      text-align: center;
+    }
+
+    .payment-success.visible {
+      display: flex;
+    }
+
+    .success-circle {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: #dcfce7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      animation: popIn 0.4s ease-out;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0); }
+      70% { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+
+    .success-title {
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .success-subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    /* ---- SCREEN TRANSITIONS ---- */
+    .screen {
+      animation: screenIn 0.25s ease-out;
+    }
+
+    @keyframes screenIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ---- UTILITIES ---- */
+    .text-center { text-align: center; }
+    .mt-8 { margin-top: 8px; }
+    .mt-16 { margin-top: 16px; }
+    .mt-24 { margin-top: 24px; }
+    .mb-8 { margin-bottom: 8px; }
+    .mb-16 { margin-bottom: 16px; }
+
+    /* ---- SCROLLBAR ---- */
+    ::-webkit-scrollbar { width: 0; }
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+
+    <!-- ==================== SEARCH SCREEN ==================== -->
+    <div class="screen active" id="screen-search">
+      <div class="search-container">
+        <div class="logo-circle">
+          <span style="filter: grayscale(1) brightness(10);">&#128269;</span>
+        </div>
+        <h1 class="search-title">EncontraZap</h1>
+        <p class="search-tagline">Encontre clientes. Chame no Zap.</p>
+
+        <div class="search-form">
+          <div class="input-group">
+            <label for="input-category">Categoria</label>
+            <input class="input-field" id="input-category" type="text" placeholder="Ex: dentistas, restaurantes..." inputmode="text" autocomplete="off">
+          </div>
+          <div class="input-group">
+            <label for="input-location">Localiza&ccedil;&atilde;o</label>
+            <input class="input-field" id="input-location" type="text" placeholder="Ex: Boa Esperan&ccedil;a, MG" inputmode="text" autocomplete="address-level2">
+          </div>
+          <button class="btn btn-primary" id="btn-search" disabled>&#128269; Buscar leads</button>
+
+          <div class="search-badge-row">
+            <span class="badge badge-green" id="search-badge">3 buscas restantes</span>
+            <button class="history-link" id="btn-history" style="display: none;">&#128203; Hist&oacute;rico</button>
+          </div>
+        </div>
+
+        <div class="search-footer">
+          <span class="search-footer-text">Extras: R$4,90/busca</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== LOADING SCREEN ==================== -->
+    <div class="screen" id="screen-loading">
+      <div class="loading-container">
+        <div class="spinner"></div>
+        <p class="loading-text">Buscando leads<span class="pulsing-dots"></span></p>
+      </div>
+    </div>
+
+    <!-- ==================== RESULTS SCREEN ==================== -->
+    <div class="screen results-screen" id="screen-results">
+      <div class="header">
+        <button class="header-back" onclick="showScreen('search')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div style="flex:1; min-width:0;">
+          <div class="header-title" id="results-category"></div>
+          <div class="header-subtitle" id="results-subtitle"></div>
+        </div>
+        <button class="header-action" onclick="showScreen('template')" title="Template">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </button>
+      </div>
+
+      <div class="template-bar" onclick="showScreen('template')">
+        <span class="template-bar-icon">&#128172;</span>
+        <span class="template-bar-text" id="template-bar-text"></span>
+        <span class="template-bar-hint">Toque para editar</span>
+      </div>
+
+      <div class="results-controls">
+        <span class="badge badge-green" id="results-badge"></span>
+        <button class="toggle-contacted" id="btn-toggle-contacted" style="display: none;" onclick="toggleHideContacted()">
+          Esconder contactados
+          <div class="toggle-switch" id="toggle-switch"></div>
+        </button>
+      </div>
+
+      <div class="leads-list" id="leads-list"></div>
+
+      <div class="all-contacted-banner" id="all-contacted-banner">
+        &#127881; Todos contactados! Fa&ccedil;a uma nova busca.
+      </div>
+
+      <div class="results-bottom">
+        <span class="results-progress-text" id="results-progress-text">0/0</span>
+        <div class="results-progress-bar">
+          <div class="results-progress-fill" id="results-progress-fill" style="width: 0%;"></div>
+        </div>
+        <span class="badge badge-green" id="results-bottom-badge"></span>
+      </div>
+    </div>
+
+    <!-- ==================== TEMPLATE SCREEN ==================== -->
+    <div class="screen" id="screen-template">
+      <div class="header">
+        <button class="header-back" onclick="goBackFromTemplate()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div style="flex:1;">
+          <div class="header-title">Template</div>
+          <div class="header-subtitle">Mensagem enviada ao clicar</div>
+        </div>
+      </div>
+
+      <div class="template-container">
+        <div class="tip-box">
+          &#128161; Use <strong>{empresa}</strong> para inserir o nome do lead automaticamente.
+        </div>
+
+        <div class="input-group">
+          <label for="input-template">Sua mensagem</label>
+          <textarea class="input-field" id="input-template" inputmode="text" autocomplete="off"></textarea>
+        </div>
+
+        <div class="preview-label">Pr&eacute;-visualiza&ccedil;&atilde;o</div>
+        <div class="wa-bubble" id="template-preview"></div>
+
+        <div class="template-actions">
+          <button class="btn btn-primary" onclick="saveTemplate()">Salvar template</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== LIMIT SCREEN ==================== -->
+    <div class="screen" id="screen-limit">
+      <div class="limit-container">
+        <div class="limit-icon">&#128274;</div>
+        <h2 class="limit-title">Suas 3 buscas gr&aacute;tis acabaram!</h2>
+        <p class="limit-subtitle">Assine o EncontraZap e tenha 20 buscas por m&ecirc;s</p>
+
+        <div class="limit-price">R$ 97<span style="font-size:18px; font-weight:600;">/m&ecirc;s</span></div>
+
+        <div class="features-list">
+          <div class="feature-item">
+            <div class="feature-check">&#10003;</div>
+            <span>20 buscas por m&ecirc;s</span>
+          </div>
+          <div class="feature-item">
+            <div class="feature-check">&#10003;</div>
+            <span>At&eacute; 400 leads/m&ecirc;s</span>
+          </div>
+          <div class="feature-item">
+            <div class="feature-check">&#10003;</div>
+            <span>Hist&oacute;rico de buscas</span>
+          </div>
+          <div class="feature-item">
+            <div class="feature-check">&#10003;</div>
+            <span>Buscas extras por R$4,90</span>
+          </div>
+        </div>
+
+        <div class="limit-actions">
+          <button class="btn btn-primary" onclick="showScreen('auth')">Assinar agora</button>
+          <button class="btn btn-secondary mt-8" onclick="showScreen('search')">Voltar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== AUTH SCREEN ==================== -->
+    <div class="screen" id="screen-auth">
+      <div class="header">
+        <button class="header-back" onclick="showScreen('limit')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div class="header-title" id="auth-header-title">Criar conta</div>
+      </div>
+
+      <div class="auth-container">
+        <div class="auth-tabs">
+          <button class="auth-tab active" id="tab-signup" onclick="switchAuthTab('signup')">Criar conta</button>
+          <button class="auth-tab" id="tab-login" onclick="switchAuthTab('login')">J&aacute; tenho conta</button>
+        </div>
+
+        <div class="auth-error" id="auth-error"></div>
+
+        <div class="input-group">
+          <label for="input-email">E-mail</label>
+          <input class="input-field" id="input-email" type="email" placeholder="seu@email.com" inputmode="email" autocomplete="email">
+        </div>
+        <div class="input-group">
+          <label for="input-password">Senha</label>
+          <input class="input-field" id="input-password" type="password" placeholder="M&iacute;nimo 6 caracteres" autocomplete="new-password" minlength="6">
+        </div>
+
+        <div class="auth-actions">
+          <button class="btn btn-primary" id="btn-auth" onclick="handleAuth()">Criar conta</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== SUBSCRIBE SCREEN ==================== -->
+    <div class="screen" id="screen-subscribe">
+      <div class="header">
+        <button class="header-back" onclick="showScreen('search')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div class="header-title">Ativar plano</div>
+      </div>
+
+      <div class="subscribe-container">
+        <h2 class="subscribe-title">Ativar EncontraZap</h2>
+        <div class="subscribe-price">R$ 97<span style="font-size:16px; font-weight:600;">/m&ecirc;s</span></div>
+
+        <button class="btn btn-primary" id="btn-generate-pix" onclick="handleSubscribe()" style="max-width: 280px;">Gerar PIX</button>
+
+        <div class="qr-container" id="sub-qr-container">
+          <img id="sub-qr-img" src="" alt="QR Code PIX">
+          <button class="pix-copy-btn" id="sub-pix-copy" onclick="copyPixCode('sub')">Copiar c&oacute;digo PIX</button>
+        </div>
+
+        <div class="pix-waiting" id="sub-pix-waiting">
+          Aguardando pagamento<span class="pulsing-dots"></span>
+        </div>
+
+        <div class="payment-success" id="sub-payment-success">
+          <div class="success-circle">&#10003;</div>
+          <div class="success-title">Pagamento confirmado!</div>
+          <div class="success-subtitle">Seu plano foi ativado com sucesso.</div>
+        </div>
+
+        <div class="pix-steps" id="sub-pix-steps">
+          <div class="pix-steps-title">Como pagar:</div>
+          <div class="pix-step"><div class="pix-step-num">1</div><span>Abra o app do seu banco</span></div>
+          <div class="pix-step"><div class="pix-step-num">2</div><span>Escolha pagar com PIX</span></div>
+          <div class="pix-step"><div class="pix-step-num">3</div><span>Escaneie o QR Code ou cole o c&oacute;digo</span></div>
+          <div class="pix-step"><div class="pix-step-num">4</div><span>Confirme o pagamento</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== HISTORY SCREEN ==================== -->
+    <div class="screen" id="screen-history">
+      <div class="header">
+        <button class="header-back" onclick="showScreen('search')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div class="header-title">Hist&oacute;rico</div>
+        <span class="badge badge-green" id="history-badge"></span>
+      </div>
+
+      <div class="history-container" id="history-container">
+        <div class="history-empty" id="history-empty">Nenhuma busca realizada ainda.</div>
+        <div id="history-list"></div>
+      </div>
+    </div>
+
+    <!-- ==================== BUY EXTRAS MODAL ==================== -->
+    <div class="modal-overlay" id="modal-extras">
+      <div class="modal-sheet">
+        <div class="modal-handle"></div>
+        <div class="modal-title">Buscas esgotadas</div>
+        <div class="modal-subtitle">Adicione buscas extras para continuar.</div>
+
+        <div class="qty-selector">
+          <button class="qty-btn" onclick="changeQty(-1)">&#8722;</button>
+          <div class="qty-value">
+            <div class="qty-number" id="qty-number">1</div>
+            <div class="qty-label" id="qty-label">busca</div>
+          </div>
+          <button class="qty-btn" onclick="changeQty(1)">+</button>
+        </div>
+
+        <div class="modal-price-line">
+          <span id="extras-calc">1 &times; R$4,90</span>
+          <span>=</span>
+          <span class="modal-total" id="extras-total">R$ 4,90</span>
+        </div>
+
+        <!-- Default state: buy button -->
+        <div class="modal-actions" id="extras-actions-buy">
+          <button class="btn btn-primary" id="btn-buy-extras" onclick="handleBuyExtra()">Comprar 1 busca extra</button>
+          <button class="btn btn-secondary" onclick="closeExtrasModal()">Voltar</button>
+        </div>
+
+        <!-- PIX generated state -->
+        <div class="modal-actions" id="extras-actions-pix" style="display: none;">
+          <div class="qr-container visible" id="extras-qr-container" style="display:block;">
+            <img id="extras-qr-img" src="" alt="QR Code PIX" style="width:160px; height:160px;">
+            <button class="pix-copy-btn" onclick="copyPixCode('extras')">Copiar c&oacute;digo PIX</button>
+          </div>
+          <div class="pix-waiting visible" style="display:block;">Aguardando pagamento<span class="pulsing-dots"></span></div>
+        </div>
+
+        <!-- Payment success state -->
+        <div class="payment-success" id="extras-payment-success">
+          <div class="success-circle">&#10003;</div>
+          <div class="success-title">Buscas adicionadas!</div>
+          <div class="success-subtitle" id="extras-success-subtitle"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /app -->
+
+  <script>
+    // =============================================
+    // CONFIG
+    // =============================================
+    const SUPABASE_URL = 'https://gejxnfusnzjijecsewoi.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdlanhuZnVzbnpqaWplY3Nld29pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwMjY5MTYsImV4cCI6MjA4ODYwMjkxNn0.cOGD6TG8gtn9LAWD6KQ0f5XwXKhiHowk7FPTSRKO1Mw';
+    const EDGE_FN_BASE = SUPABASE_URL + '/functions/v1';
+
+    const DEFAULT_TEMPLATE = 'Ol\u00e1, tudo bem? Vi a {empresa} no Google e gostaria de conversar sobre uma oportunidade. Posso te explicar em 2 minutos?';
+    const DEFAULT_FREE_SEARCHES = 3;
+    const PAID_MONTHLY_SEARCHES = 20;
+    const EXTRA_PRICE = 4.90;
+
+    // =============================================
+    // SUPABASE CLIENT
+    // =============================================
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // =============================================
+    // STATE
+    // =============================================
+    let currentUser = null;
+    let userProfile = null; // { searches_left, plan, template }
+    let currentLeads = [];
+    let currentCategory = '';
+    let currentLocation = '';
+    let authMode = 'signup'; // 'signup' | 'login'
+    let hideContacted = false;
+    let extraQty = 1;
+    let currentPixCode = { sub: '', extras: '' };
+    let pollingInterval = null;
+    let previousScreen = 'search';
+
+    // =============================================
+    // SCREEN MANAGEMENT
+    // =============================================
+    function showScreen(name) {
+      const allScreens = document.querySelectorAll('.screen');
+      allScreens.forEach(s => s.classList.remove('active'));
+      const target = document.getElementById('screen-' + name);
+      if (target) {
+        target.classList.add('active');
+      }
+
+      // Update state when showing screens
+      if (name === 'search') {
+        updateSearchBadge();
+        updateHistoryBtnVisibility();
+      }
+      if (name === 'results') {
+        updateResultsBadges();
+        updateTemplateBar();
+      }
+      if (name === 'template') {
+        loadTemplateScreen();
+      }
+      if (name === 'history') {
+        loadHistory();
+      }
+    }
+
+    // =============================================
+    // SEARCHES LEFT
+    // =============================================
+    function getSearchesLeft() {
+      if (userProfile) {
+        return userProfile.searches_left || 0;
+      }
+      const stored = localStorage.getItem('ez_searches_left');
+      if (stored === null) {
+        localStorage.setItem('ez_searches_left', DEFAULT_FREE_SEARCHES);
+        return DEFAULT_FREE_SEARCHES;
+      }
+      return parseInt(stored, 10);
+    }
+
+    function setSearchesLeft(val) {
+      if (val < 0) val = 0;
+      if (userProfile) {
+        userProfile.searches_left = val;
+        // Also update Supabase in background
+        if (currentUser) {
+          supabase.from('users').update({ searches_left: val }).eq('id', currentUser.id).then(() => {});
+        }
+      } else {
+        localStorage.setItem('ez_searches_left', val);
+      }
+    }
+
+    function isPaidUser() {
+      return userProfile && userProfile.plan === 'paid';
+    }
+
+    // =============================================
+    // TEMPLATE
+    // =============================================
+    function getTemplate() {
+      if (userProfile && userProfile.template) return userProfile.template;
+      return localStorage.getItem('ez_template') || DEFAULT_TEMPLATE;
+    }
+
+    function setTemplate(val) {
+      localStorage.setItem('ez_template', val);
+      if (userProfile) {
+        userProfile.template = val;
+        if (currentUser) {
+          supabase.from('users').update({ template: val }).eq('id', currentUser.id).then(() => {});
+        }
+      }
+    }
+
+    function renderTemplate(template, name) {
+      return template.replace(/\{empresa\}/g, name || '{empresa}');
+    }
+
+    // =============================================
+    // CONTACTED STATE
+    // =============================================
+    function getSearchHash() {
+      return btoa(currentCategory.toLowerCase().trim() + '|' + currentLocation.toLowerCase().trim()).replace(/[^a-zA-Z0-9]/g, '').substring(0, 24);
+    }
+
+    function getContactedSet() {
+      const key = 'ez_contacted_' + getSearchHash();
+      try {
+        return new Set(JSON.parse(localStorage.getItem(key) || '[]'));
+      } catch {
+        return new Set();
+      }
+    }
+
+    function markContacted(index) {
+      const key = 'ez_contacted_' + getSearchHash();
+      const set = getContactedSet();
+      set.add(index);
+      localStorage.setItem(key, JSON.stringify([...set]));
+    }
+
+    // =============================================
+    // BADGE HELPERS
+    // =============================================
+    function getBadgeClass(searches) {
+      if (searches <= 0) return 'badge-red';
+      if (searches === 1) return 'badge-yellow';
+      return 'badge-green';
+    }
+
+    function updateSearchBadge() {
+      const searches = getSearchesLeft();
+      const badge = document.getElementById('search-badge');
+      badge.textContent = searches + ' busca' + (searches !== 1 ? 's' : '') + ' restante' + (searches !== 1 ? 's' : '');
+      badge.className = 'badge ' + getBadgeClass(searches);
+    }
+
+    function updateResultsBadges() {
+      const searches = getSearchesLeft();
+      const text = searches + ' busca' + (searches !== 1 ? 's' : '');
+      const cls = 'badge ' + getBadgeClass(searches);
+
+      const b1 = document.getElementById('results-badge');
+      b1.textContent = text;
+      b1.className = cls;
+
+      const b2 = document.getElementById('results-bottom-badge');
+      b2.textContent = text;
+      b2.className = cls;
+    }
+
+    function updateHistoryBtnVisibility() {
+      const btn = document.getElementById('btn-history');
+      btn.style.display = currentUser ? 'inline' : 'none';
+    }
+
+    function updateTemplateBar() {
+      const tpl = getTemplate();
+      document.getElementById('template-bar-text').textContent = tpl.substring(0, 60) + (tpl.length > 60 ? '...' : '');
+    }
+
+    // =============================================
+    // SEARCH BUTTON STATE
+    // =============================================
+    function updateSearchBtn() {
+      const cat = document.getElementById('input-category').value.trim();
+      const loc = document.getElementById('input-location').value.trim();
+      document.getElementById('btn-search').disabled = !(cat && loc);
+    }
+
+    document.getElementById('input-category').addEventListener('input', updateSearchBtn);
+    document.getElementById('input-location').addEventListener('input', updateSearchBtn);
+
+    // =============================================
+    // SEARCH FLOW
+    // =============================================
+    document.getElementById('btn-search').addEventListener('click', handleSearch);
+
+    async function handleSearch() {
+      const category = document.getElementById('input-category').value.trim();
+      const location = document.getElementById('input-location').value.trim();
+      if (!category || !location) return;
+
+      const searches = getSearchesLeft();
+      if (searches <= 0) {
+        if (isPaidUser()) {
+          showExtrasModal();
+        } else {
+          showScreen('limit');
+        }
+        return;
+      }
+
+      currentCategory = category;
+      currentLocation = location;
+      showScreen('loading');
+
+      try {
+        const headers = {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_ANON_KEY
+        };
+
+        // Add auth header if logged in
+        if (currentUser) {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session) {
+            headers['Authorization'] = 'Bearer ' + session.access_token;
+          }
+        }
+
+        const resp = await fetch(EDGE_FN_BASE + '/encontrazap-search', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ category, location })
+        });
+
+        if (!resp.ok) {
+          throw new Error('Erro na busca: ' + resp.status);
+        }
+
+        const data = await resp.json();
+        currentLeads = data.leads || [];
+
+        // Decrement searches
+        setSearchesLeft(getSearchesLeft() - 1);
+
+        // Save to last results
+        localStorage.setItem('ez_last_results', JSON.stringify({
+          category, location, leads: currentLeads, date: new Date().toISOString()
+        }));
+
+        renderResults(currentLeads);
+        showScreen('results');
+      } catch (err) {
+        console.error('Search error:', err);
+        alert('Erro ao buscar leads. Tente novamente.');
+        showScreen('search');
+      }
+    }
+
+    // =============================================
+    // RENDER RESULTS
+    // =============================================
+    function renderResults(leads) {
+      // Header
+      document.getElementById('results-category').textContent = currentCategory;
+      document.getElementById('results-subtitle').textContent = currentLocation + ' \u00b7 ' + leads.length + ' lead' + (leads.length !== 1 ? 's' : '');
+
+      const list = document.getElementById('leads-list');
+      list.innerHTML = '';
+
+      const contacted = getContactedSet();
+      const hasAnyContacted = contacted.size > 0;
+      const toggleBtn = document.getElementById('btn-toggle-contacted');
+      toggleBtn.style.display = hasAnyContacted ? 'flex' : 'none';
+
+      leads.forEach((lead, i) => {
+        const isContacted = contacted.has(i);
+        const item = document.createElement('div');
+        item.className = 'lead-item' + (isContacted ? ' contacted' : '') + (hideContacted && isContacted ? ' hidden' : '');
+        item.id = 'lead-' + i;
+
+        // Rating color
+        const rating = parseFloat(lead.rating) || 0;
+        let ratingClass = 'mid';
+        if (rating >= 4.5) ratingClass = 'high';
+        else if (rating < 4.0) ratingClass = 'low';
+
+        const phone = (lead.phone || '').replace(/\D/g, '');
+        const waUrl = getWaUrl(phone, lead.name);
+
+        item.innerHTML = `
+          <div class="lead-index">${i + 1}</div>
+          <div class="lead-info">
+            <div class="lead-name">
+              ${escapeHtml(lead.name || 'Sem nome')}
+              <span class="lead-contacted-check">&#10004;</span>
+            </div>
+            <div class="lead-meta">
+              ${rating > 0 ? `<span class="lead-rating ${ratingClass}">\u2b50 ${rating.toFixed(1)}</span> \u00b7` : ''}
+              ${lead.reviews ? `${lead.reviews} avalia\u00e7\u00f5es \u00b7` : ''}
+              ${lead.address ? escapeHtml(lead.address) : ''}
+            </div>
+          </div>
+          <a class="lead-wa-btn" href="${waUrl}" target="_blank" rel="noopener" onclick="handleWhatsAppClick(${i}, '${phone}', '${escapeHtml(lead.name || '')}'); return true;">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" fill="white"/></svg>
+          </a>
+        `;
+        list.appendChild(item);
+      });
+
+      updateResultsProgress();
+      updateTemplateBar();
+
+      // Check if all contacted
+      checkAllContacted();
+    }
+
+    function updateResultsProgress() {
+      const contacted = getContactedSet();
+      const total = currentLeads.length;
+      const done = Math.min(contacted.size, total);
+
+      document.getElementById('results-progress-text').textContent = done + '/' + total;
+      const pct = total > 0 ? (done / total * 100) : 0;
+      document.getElementById('results-progress-fill').style.width = pct + '%';
+    }
+
+    function checkAllContacted() {
+      const contacted = getContactedSet();
+      const banner = document.getElementById('all-contacted-banner');
+      if (currentLeads.length > 0 && contacted.size >= currentLeads.length) {
+        banner.style.display = 'block';
+      } else {
+        banner.style.display = 'none';
+      }
+    }
+
+    // =============================================
+    // WHATSAPP CLICK
+    // =============================================
+    function handleWhatsAppClick(index, phone, name) {
+      markContacted(index);
+
+      const item = document.getElementById('lead-' + index);
+      if (item) {
+        item.classList.add('contacted');
+        if (hideContacted) {
+          item.classList.add('hidden');
+        }
+      }
+
+      // Show toggle button if first contact
+      document.getElementById('btn-toggle-contacted').style.display = 'flex';
+
+      updateResultsProgress();
+      checkAllContacted();
+    }
+
+    function getWaUrl(phone, name) {
+      const template = getTemplate();
+      const message = renderTemplate(template, name);
+      const cleanPhone = phone.replace(/\D/g, '');
+      return 'https://wa.me/' + cleanPhone + '?text=' + encodeURIComponent(message);
+    }
+
+    // =============================================
+    // TOGGLE HIDE CONTACTED
+    // =============================================
+    function toggleHideContacted() {
+      hideContacted = !hideContacted;
+      const sw = document.getElementById('toggle-switch');
+      sw.classList.toggle('on', hideContacted);
+
+      const contacted = getContactedSet();
+      currentLeads.forEach((_, i) => {
+        const item = document.getElementById('lead-' + i);
+        if (item && contacted.has(i)) {
+          item.classList.toggle('hidden', hideContacted);
+        }
+      });
+    }
+
+    // =============================================
+    // TEMPLATE SCREEN
+    // =============================================
+    function loadTemplateScreen() {
+      const textarea = document.getElementById('input-template');
+      textarea.value = getTemplate();
+      updateTemplatePreview();
+    }
+
+    document.getElementById('input-template').addEventListener('input', updateTemplatePreview);
+
+    function updateTemplatePreview() {
+      const val = document.getElementById('input-template').value;
+      document.getElementById('template-preview').textContent = renderTemplate(val, 'Smith Dental Care');
+    }
+
+    function saveTemplate() {
+      const val = document.getElementById('input-template').value.trim();
+      if (val) {
+        setTemplate(val);
+      }
+      goBackFromTemplate();
+    }
+
+    function goBackFromTemplate() {
+      // Go back to results if we have leads, otherwise search
+      if (currentLeads.length > 0) {
+        showScreen('results');
+      } else {
+        showScreen('search');
+      }
+    }
+
+    // =============================================
+    // AUTH SCREEN
+    // =============================================
+    function switchAuthTab(mode) {
+      authMode = mode;
+      document.getElementById('tab-signup').classList.toggle('active', mode === 'signup');
+      document.getElementById('tab-login').classList.toggle('active', mode === 'login');
+      document.getElementById('btn-auth').textContent = mode === 'signup' ? 'Criar conta' : 'Entrar';
+      document.getElementById('auth-header-title').textContent = mode === 'signup' ? 'Criar conta' : 'Entrar';
+      document.getElementById('input-password').autocomplete = mode === 'signup' ? 'new-password' : 'current-password';
+      hideAuthError();
+    }
+
+    function showAuthError(msg) {
+      const el = document.getElementById('auth-error');
+      el.textContent = msg;
+      el.classList.add('visible');
+    }
+
+    function hideAuthError() {
+      document.getElementById('auth-error').classList.remove('visible');
+    }
+
+    async function handleAuth() {
+      const email = document.getElementById('input-email').value.trim();
+      const password = document.getElementById('input-password').value;
+
+      if (!email || !password) {
+        showAuthError('Preencha todos os campos.');
+        return;
+      }
+
+      if (password.length < 6) {
+        showAuthError('A senha deve ter no m\u00ednimo 6 caracteres.');
+        return;
+      }
+
+      hideAuthError();
+      const btn = document.getElementById('btn-auth');
+      btn.disabled = true;
+      btn.textContent = 'Aguarde...';
+
+      try {
+        if (authMode === 'signup') {
+          const { data, error } = await supabase.auth.signUp({ email, password });
+          if (error) throw error;
+          currentUser = data.user;
+          await initUserProfile();
+          showScreen('subscribe');
+        } else {
+          const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+          if (error) throw error;
+          currentUser = data.user;
+          await fetchUserProfile();
+          if (isPaidUser()) {
+            showScreen('search');
+          } else {
+            showScreen('subscribe');
+          }
+        }
+      } catch (err) {
+        console.error('Auth error:', err);
+        let msg = 'Erro ao processar. Tente novamente.';
+        if (err.message) {
+          if (err.message.includes('Invalid login')) msg = 'E-mail ou senha incorretos.';
+          else if (err.message.includes('already registered')) msg = 'Este e-mail j\u00e1 est\u00e1 cadastrado.';
+          else if (err.message.includes('invalid')) msg = 'E-mail inv\u00e1lido.';
+          else msg = err.message;
+        }
+        showAuthError(msg);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = authMode === 'signup' ? 'Criar conta' : 'Entrar';
+      }
+    }
+
+    // =============================================
+    // USER PROFILE
+    // =============================================
+    async function initUserProfile() {
+      if (!currentUser) return;
+      // Create profile with free searches carried over from localStorage
+      const freeLeft = parseInt(localStorage.getItem('ez_searches_left') || '0', 10);
+      const template = localStorage.getItem('ez_template') || DEFAULT_TEMPLATE;
+
+      userProfile = {
+        searches_left: freeLeft,
+        plan: 'free',
+        template: template
+      };
+
+      // Insert into Supabase (upsert)
+      await supabase.from('users').upsert({
+        id: currentUser.id,
+        email: currentUser.email,
+        searches_left: freeLeft,
+        plan: 'free',
+        template: template,
+        created_at: new Date().toISOString()
+      });
+    }
+
+    async function fetchUserProfile() {
+      if (!currentUser) return;
+      const { data, error } = await supabase.from('users').select('*').eq('id', currentUser.id).single();
+      if (data) {
+        userProfile = data;
+      } else {
+        // Profile doesn't exist yet, create
+        await initUserProfile();
+      }
+    }
+
+    // =============================================
+    // SUBSCRIBE FLOW (PIX)
+    // =============================================
+    async function handleSubscribe() {
+      const btn = document.getElementById('btn-generate-pix');
+      btn.disabled = true;
+      btn.textContent = 'Gerando PIX...';
+
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const resp = await fetch(EDGE_FN_BASE + '/encontrazap-subscribe', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': 'Bearer ' + (session ? session.access_token : '')
+          },
+          body: JSON.stringify({ plan: 'monthly' })
+        });
+
+        if (!resp.ok) throw new Error('Erro ao gerar PIX');
+        const data = await resp.json();
+
+        // Show QR
+        document.getElementById('sub-qr-img').src = 'data:image/png;base64,' + (data.qrCodeImage || '');
+        currentPixCode.sub = data.qrCodeText || '';
+        document.getElementById('sub-qr-container').classList.add('visible');
+        document.getElementById('sub-pix-waiting').classList.add('visible');
+        document.getElementById('sub-pix-steps').classList.add('visible');
+        btn.style.display = 'none';
+
+        // Start polling
+        startPaymentPolling(data.paymentId, (success) => {
+          if (success) {
+            document.getElementById('sub-qr-container').classList.remove('visible');
+            document.getElementById('sub-pix-waiting').classList.remove('visible');
+            document.getElementById('sub-pix-steps').classList.remove('visible');
+            document.getElementById('sub-payment-success').classList.add('visible');
+
+            // Update profile
+            if (userProfile) {
+              userProfile.plan = 'paid';
+              userProfile.searches_left = PAID_MONTHLY_SEARCHES;
+            }
+            setSearchesLeft(PAID_MONTHLY_SEARCHES);
+
+            setTimeout(() => {
+              showScreen('search');
+              document.getElementById('sub-payment-success').classList.remove('visible');
+              btn.style.display = '';
+              btn.disabled = false;
+              btn.textContent = 'Gerar PIX';
+            }, 2500);
+          }
+        });
+      } catch (err) {
+        console.error('Subscribe error:', err);
+        alert('Erro ao gerar PIX. Tente novamente.');
+        btn.disabled = false;
+        btn.textContent = 'Gerar PIX';
+      }
+    }
+
+    // =============================================
+    // PAYMENT POLLING
+    // =============================================
+    function startPaymentPolling(paymentId, callback) {
+      if (pollingInterval) clearInterval(pollingInterval);
+
+      pollingInterval = setInterval(async () => {
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          const resp = await fetch(EDGE_FN_BASE + '/encontrazap-verify-payment', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': SUPABASE_ANON_KEY,
+              'Authorization': 'Bearer ' + (session ? session.access_token : '')
+            },
+            body: JSON.stringify({ paymentId: paymentId })
+          });
+
+          if (!resp.ok) return;
+          const data = await resp.json();
+
+          if (data.status === 'CONFIRMED' || data.status === 'RECEIVED' || data.paid === true) {
+            clearInterval(pollingInterval);
+            pollingInterval = null;
+            callback(true);
+          }
+        } catch (err) {
+          console.error('Polling error:', err);
+        }
+      }, 5000);
+    }
+
+    // =============================================
+    // COPY PIX CODE
+    // =============================================
+    function copyPixCode(type) {
+      const code = currentPixCode[type];
+      if (!code) return;
+
+      navigator.clipboard.writeText(code).then(() => {
+        const btn = type === 'sub'
+          ? document.getElementById('sub-pix-copy')
+          : document.querySelector('#extras-qr-container .pix-copy-btn');
+        if (btn) {
+          const orig = btn.textContent;
+          btn.textContent = 'Copiado!';
+          setTimeout(() => { btn.textContent = orig; }, 2000);
+        }
+      }).catch(() => {
+        // Fallback
+        const ta = document.createElement('textarea');
+        ta.value = code;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      });
+    }
+
+    // =============================================
+    // BUY EXTRAS MODAL
+    // =============================================
+    function showExtrasModal() {
+      extraQty = 1;
+      updateExtrasUI();
+      document.getElementById('extras-actions-buy').style.display = '';
+      document.getElementById('extras-actions-pix').style.display = 'none';
+      document.getElementById('extras-payment-success').classList.remove('visible');
+      document.getElementById('modal-extras').classList.add('visible');
+    }
+
+    function closeExtrasModal() {
+      document.getElementById('modal-extras').classList.remove('visible');
+      if (pollingInterval) {
+        clearInterval(pollingInterval);
+        pollingInterval = null;
+      }
+    }
+
+    function changeQty(delta) {
+      extraQty = Math.max(1, Math.min(50, extraQty + delta));
+      updateExtrasUI();
+    }
+
+    function updateExtrasUI() {
+      document.getElementById('qty-number').textContent = extraQty;
+      document.getElementById('qty-label').textContent = extraQty === 1 ? 'busca' : 'buscas';
+      const total = (extraQty * EXTRA_PRICE).toFixed(2).replace('.', ',');
+      document.getElementById('extras-calc').textContent = extraQty + ' \u00d7 R$4,90';
+      document.getElementById('extras-total').textContent = 'R$ ' + total;
+      document.getElementById('btn-buy-extras').textContent = 'Comprar ' + extraQty + ' busca' + (extraQty !== 1 ? 's' : '') + ' extra' + (extraQty !== 1 ? 's' : '');
+    }
+
+    async function handleBuyExtra() {
+      const btn = document.getElementById('btn-buy-extras');
+      btn.disabled = true;
+      btn.textContent = 'Gerando PIX...';
+
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const resp = await fetch(EDGE_FN_BASE + '/encontrazap-buy-extra', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': 'Bearer ' + (session ? session.access_token : '')
+          },
+          body: JSON.stringify({ quantity: extraQty })
+        });
+
+        if (!resp.ok) throw new Error('Erro ao gerar PIX');
+        const data = await resp.json();
+
+        // Show PIX
+        document.getElementById('extras-qr-img').src = 'data:image/png;base64,' + (data.qrCodeImage || '');
+        currentPixCode.extras = data.qrCodeText || '';
+        document.getElementById('extras-actions-buy').style.display = 'none';
+        document.getElementById('extras-actions-pix').style.display = '';
+
+        // Poll
+        const purchasedQty = extraQty;
+        startPaymentPolling(data.paymentId, (success) => {
+          if (success) {
+            document.getElementById('extras-actions-pix').style.display = 'none';
+            document.getElementById('extras-payment-success').classList.add('visible');
+            document.getElementById('extras-success-subtitle').textContent = purchasedQty + ' busca' + (purchasedQty !== 1 ? 's' : '') + ' adicionada' + (purchasedQty !== 1 ? 's' : '') + ' com sucesso!';
+
+            setSearchesLeft(getSearchesLeft() + purchasedQty);
+            updateSearchBadge();
+
+            setTimeout(() => {
+              closeExtrasModal();
+            }, 2500);
+          }
+        });
+      } catch (err) {
+        console.error('Buy extra error:', err);
+        alert('Erro ao gerar PIX. Tente novamente.');
+        btn.disabled = false;
+        updateExtrasUI();
+      }
+    }
+
+    // =============================================
+    // HISTORY
+    // =============================================
+    async function loadHistory() {
+      const listEl = document.getElementById('history-list');
+      const emptyEl = document.getElementById('history-empty');
+      listEl.innerHTML = '';
+
+      if (!currentUser) {
+        emptyEl.style.display = 'block';
+        document.getElementById('history-badge').textContent = '0';
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('searches')
+          .select('*')
+          .eq('user_id', currentUser.id)
+          .order('created_at', { ascending: false })
+          .limit(50);
+
+        if (error || !data || data.length === 0) {
+          emptyEl.style.display = 'block';
+          document.getElementById('history-badge').textContent = '0';
+          return;
+        }
+
+        emptyEl.style.display = 'none';
+        document.getElementById('history-badge').textContent = data.length;
+        document.getElementById('history-badge').className = 'badge badge-green';
+
+        data.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'history-item';
+          div.onclick = () => {
+            document.getElementById('input-category').value = item.category || '';
+            document.getElementById('input-location').value = item.location || '';
+            updateSearchBtn();
+            showScreen('search');
+            handleSearch();
+          };
+
+          const date = new Date(item.created_at);
+          const dateStr = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+
+          div.innerHTML = `
+            <div class="history-icon">&#128269;</div>
+            <div class="history-info">
+              <div class="history-category">${escapeHtml(item.category || '')}</div>
+              <div class="history-location">${escapeHtml(item.location || '')}</div>
+            </div>
+            <div class="history-right">
+              <div class="history-leads">${item.leads_count || 0} leads</div>
+              <div class="history-date">${dateStr}</div>
+            </div>
+          `;
+          listEl.appendChild(div);
+        });
+      } catch (err) {
+        console.error('History error:', err);
+        emptyEl.textContent = 'Erro ao carregar hist\u00f3rico.';
+        emptyEl.style.display = 'block';
+      }
+    }
+
+    // =============================================
+    // UTILS
+    // =============================================
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // =============================================
+    // INIT ON PAGE LOAD
+    // =============================================
+    async function init() {
+      // Check auth session
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session && session.user) {
+          currentUser = session.user;
+          await fetchUserProfile();
+        }
+      } catch (err) {
+        console.error('Init auth error:', err);
+      }
+
+      // Initialize search badge
+      updateSearchBadge();
+      updateHistoryBtnVisibility();
+
+      // Show search screen (already active by default)
+      showScreen('search');
+
+      // Listen for auth state changes
+      supabase.auth.onAuthStateChange((event, session) => {
+        if (session && session.user) {
+          currentUser = session.user;
+        } else {
+          currentUser = null;
+          userProfile = null;
+        }
+        updateHistoryBtnVisibility();
+      });
+    }
+
+    // History button click
+    document.getElementById('btn-history').addEventListener('click', () => {
+      showScreen('history');
+    });
+
+    // Run init
+    init();
+  </script>
+</body>
+</html>
