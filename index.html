@@ -18,7 +18,7 @@
     :root {
       --primary: #25D366;
       --primary-dark: #128C7E;
-      --bg: #fafafa;
+      --bg: #ECE5DD;
       --text: #111827;
       --text-muted: #6b7280;
       --border: #e5e7eb;
@@ -47,7 +47,7 @@
       width: 100%;
       max-width: 480px;
       min-height: 100dvh;
-      background: #fff;
+      background: var(--bg);
       position: relative;
       overflow-x: hidden;
     }
@@ -71,7 +71,7 @@
       border-bottom: 1px solid var(--border);
       position: sticky;
       top: 0;
-      background: #fff;
+      background: var(--bg);
       z-index: 10;
     }
 
@@ -79,7 +79,7 @@
       width: 36px;
       height: 36px;
       border: none;
-      background: var(--bg);
+      background: rgba(255,255,255,0.7);
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -114,7 +114,7 @@
       width: 36px;
       height: 36px;
       border: none;
-      background: var(--bg);
+      background: rgba(255,255,255,0.7);
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -199,7 +199,7 @@
     }
 
     .btn-secondary {
-      background: var(--bg);
+      background: #fff;
       color: var(--text);
       border: 2px solid var(--border);
     }
@@ -482,7 +482,7 @@
       width: 28px;
       height: 28px;
       border-radius: 50%;
-      background: var(--bg);
+      background: #fff;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -872,7 +872,7 @@
     .pix-step-num {
       width: 22px;
       height: 22px;
-      background: var(--bg);
+      background: #fff;
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -1159,19 +1159,19 @@
         <div class="search-form">
           <div class="input-group">
             <label for="input-category">Tipo de empresa</label>
-            <input class="input-field" id="input-category" type="text" placeholder="Ex: dentistas, restaurantes..." inputmode="text" autocomplete="off">
+            <input class="input-field" id="input-category" type="text" placeholder="Ex: sal&#227;o de beleza, com&#233;rcio, cl&#237;nicas..." inputmode="text" autocomplete="off">
           </div>
           <div class="input-group">
             <label for="input-location">Cidade</label>
             <input class="input-field" id="input-location" type="text" placeholder="Ex: Boa Esperan&ccedil;a, MG" inputmode="text" autocomplete="address-level2">
           </div>
-          <button class="btn btn-primary" id="btn-search" disabled>&#128269; Buscar leads</button>
+          <button class="btn btn-primary" id="btn-search" disabled>&#128269; Buscar empresas</button>
 
           <div class="search-badge-row">
             <span class="badge badge-green" id="search-badge">3 buscas restantes</span>
           </div>
 
-          <button class="btn btn-secondary" id="btn-history" style="display: none;" onclick="loadLastResults()">&#128203; Ver &uacute;ltima busca</button>
+          <button class="btn btn-secondary" id="btn-history" style="display: none; margin-top: 24px;" onclick="loadLastResults()">&#128203; Ver &uacute;ltima busca</button>
         </div>
 
         <div class="search-footer"></div>
