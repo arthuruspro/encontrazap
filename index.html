@@ -2959,8 +2959,23 @@
       // Initialize search badge
       updateSearchBadge();
 
-      // Show search screen (already active by default)
-      showScreen('search');
+      // Restaurar últimos resultados se existirem
+      try {
+        var lastResults = JSON.parse(localStorage.getItem('ez_last_results') || 'null');
+        if (lastResults && lastResults.leads && lastResults.leads.length > 0) {
+          currentCategory = lastResults.category || '';
+          currentLocation = lastResults.location || '';
+          currentLeads = lastResults.leads;
+          document.getElementById('input-category').value = currentCategory;
+          document.getElementById('input-location').value = currentLocation;
+          renderResults(currentLeads);
+          showScreen('results');
+        } else {
+          showScreen('search');
+        }
+      } catch (e) {
+        showScreen('search');
+      }
 
       // Listen for auth state changes
       sb.auth.onAuthStateChange((event, session) => {
