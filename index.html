@@ -1798,6 +1798,10 @@
       if (target) {
         target.classList.add('active');
       }
+      // Salvar tela atual pra persistir no refresh
+      if (name === 'results' || name === 'search') {
+        localStorage.setItem('ez_current_screen', name);
+      }
 
       // Loading hints rotation
       if (name === 'loading') {
@@ -2959,21 +2963,26 @@
       // Initialize search badge
       updateSearchBadge();
 
-      // Restaurar últimos resultados se existirem
-      try {
-        var lastResults = JSON.parse(localStorage.getItem('ez_last_results') || 'null');
-        if (lastResults && lastResults.leads && lastResults.leads.length > 0) {
-          currentCategory = lastResults.category || '';
-          currentLocation = lastResults.location || '';
-          currentLeads = lastResults.leads;
-          document.getElementById('input-category').value = currentCategory;
-          document.getElementById('input-location').value = currentLocation;
-          renderResults(currentLeads);
-          showScreen('results');
-        } else {
+      // Restaurar resultados só se estava na tela de resultados
+      var savedScreen = localStorage.getItem('ez_current_screen');
+      if (savedScreen === 'results') {
+        try {
+          var lastResults = JSON.parse(localStorage.getItem('ez_last_results') || 'null');
+          if (lastResults && lastResults.leads && lastResults.leads.length > 0) {
+            currentCategory = lastResults.category || '';
+            currentLocation = lastResults.location || '';
+            currentLeads = lastResults.leads;
+            document.getElementById('input-category').value = currentCategory;
+            document.getElementById('input-location').value = currentLocation;
+            renderResults(currentLeads);
+            showScreen('results');
+          } else {
+            showScreen('search');
+          }
+        } catch (e) {
           showScreen('search');
         }
-      } catch (e) {
+      } else {
         showScreen('search');
       }
 
