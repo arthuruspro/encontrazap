@@ -2101,8 +2101,22 @@
       const val = document.getElementById('input-template').value.trim();
       if (val) {
         setTemplate(val);
+        updateWhatsAppLinks();
       }
       goBackFromTemplate();
+    }
+
+    function updateWhatsAppLinks() {
+      if (!currentLeads || currentLeads.length === 0) return;
+      currentLeads.forEach((lead, i) => {
+        const phone = (lead.phone || '').replace(/\D/g, '');
+        const waUrl = getWaUrl(phone, lead.name);
+        const item = document.getElementById('lead-' + i);
+        if (item) {
+          const link = item.querySelector('.lead-wa-btn');
+          if (link) link.href = waUrl;
+        }
+      });
     }
 
     function goBackFromTemplate() {
