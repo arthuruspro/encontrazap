@@ -1592,7 +1592,7 @@
       <!-- Banner para free users: upsell envio em massa -->
       <div id="dispatch-upsell" style="display:none; margin:8px 16px 4px; padding:12px 16px; background:#fef2f2; border:1px solid #fecaca; border-radius:12px; text-align:center;">
         <p style="font-size:13px; color:#991b1b; margin-bottom:8px;">&#128274; Envio em massa n&atilde;o dispon&iacute;vel no plano gratuito</p>
-        <button onclick="showScreen('limit')" style="background:none; border:none; color:var(--primary-dark); font-weight:700; font-size:14px; cursor:pointer; font-family:inherit; padding:4px 0;">Ativar plano &rarr;</button>
+        <button onclick="showLimitScreen('upsell')" style="background:none; border:none; color:var(--primary-dark); font-weight:700; font-size:14px; cursor:pointer; font-family:inherit; padding:4px 0;">Ativar plano &rarr;</button>
       </div>
 
       <div class="template-bar" onclick="showScreen('template')">
@@ -1679,8 +1679,8 @@
       <div class="limit-container">
         <div class="limit-card">
           <div class="limit-logo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
-          <h2 class="limit-title">Suas buscas gr&aacute;tis acabaram!</h2>
-          <p class="limit-subtitle">Continue encontrando empresas com o plano mensal</p>
+          <h2 class="limit-title" id="limit-title">Suas buscas gr&aacute;tis acabaram!</h2>
+          <p class="limit-subtitle" id="limit-subtitle">Continue encontrando empresas com o plano mensal</p>
 
           <div class="limit-price-row">
             <span class="limit-price-value">R$97</span>
@@ -2262,7 +2262,7 @@
         if (isPaidUser()) {
           showExtrasModal();
         } else {
-          showScreen('limit');
+          showLimitScreen('no_searches');
         }
         return;
       }
@@ -2299,7 +2299,7 @@
 
         if (!resp.ok) {
           if (resp.status === 402 || data.code === 'NO_SEARCHES') {
-            if (isPaidUser()) { showExtrasModal(); } else { showScreen('limit'); }
+            if (isPaidUser()) { showExtrasModal(); } else { showLimitScreen('no_searches'); }
             return;
           }
           throw new Error(data.error || 'Erro na busca: ' + resp.status);
@@ -3360,9 +3360,23 @@
       showScreen(previousScreen || 'search');
     }
 
+    function showLimitScreen(reason) {
+      var title = document.getElementById('limit-title');
+      var subtitle = document.getElementById('limit-subtitle');
+      if (reason === 'upsell') {
+        title.textContent = 'Desbloqueie o envio em massa';
+        subtitle.textContent = 'Envie mensagens para todos os leads com 1 clique';
+      } else {
+        title.innerHTML = 'Suas buscas gr\u00e1tis acabaram!';
+        subtitle.textContent = 'Continue encontrando empresas com o plano mensal';
+      }
+      showScreen('limit');
+    }
+
     // Expor funções pro escopo global (usadas em onclick no HTML)
     window.showScreen = showScreen;
     window.goBack = goBack;
+    window.showLimitScreen = showLimitScreen;
     window.toggleHideContacted = toggleHideContacted;
     window.handleWhatsAppClick = handleWhatsAppClick;
     window.goBackFromTemplate = goBackFromTemplate;
