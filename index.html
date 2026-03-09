@@ -1167,7 +1167,7 @@
           </div>
           <button class="btn btn-primary" id="btn-search" disabled>&#128269; Buscar empresas</button>
 
-          <div class="search-badge-row">
+          <div class="search-badge-row" style="display: none;">
             <span class="badge badge-green" id="search-badge">3 buscas restantes</span>
           </div>
 
@@ -1631,16 +1631,7 @@
     }
 
     function updateSearchBadge() {
-      const searches = getSearchesLeft();
-      const badge = document.getElementById('search-badge');
-      if (searches <= 0) {
-        // Esconder badge quando 0 — pra não desanimar o usuário
-        badge.style.display = 'none';
-      } else {
-        badge.style.display = '';
-        badge.textContent = searches + ' busca' + (searches !== 1 ? 's' : '') + ' restante' + (searches !== 1 ? 's' : '');
-        badge.className = 'badge ' + getBadgeClass(searches);
-      }
+      // Badge removido — usuário usa sem ver contador
     }
 
     function updateResultsBadges() {
