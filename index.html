@@ -1174,9 +1174,7 @@
           <button class="btn btn-secondary" id="btn-history" style="display: none;" onclick="loadLastResults()">&#128203; Ver &uacute;ltima busca</button>
         </div>
 
-        <div class="search-footer">
-          <span class="search-footer-text">Extras: R$4,90/busca</span>
-        </div>
+        <div class="search-footer"></div>
       </div>
     </div>
 
@@ -1635,8 +1633,14 @@
     function updateSearchBadge() {
       const searches = getSearchesLeft();
       const badge = document.getElementById('search-badge');
-      badge.textContent = searches + ' busca' + (searches !== 1 ? 's' : '') + ' restante' + (searches !== 1 ? 's' : '');
-      badge.className = 'badge ' + getBadgeClass(searches);
+      if (searches <= 0) {
+        // Esconder badge quando 0 — pra não desanimar o usuário
+        badge.style.display = 'none';
+      } else {
+        badge.style.display = '';
+        badge.textContent = searches + ' busca' + (searches !== 1 ? 's' : '') + ' restante' + (searches !== 1 ? 's' : '');
+        badge.className = 'badge ' + getBadgeClass(searches);
+      }
     }
 
     function updateResultsBadges() {
@@ -1934,9 +1938,15 @@
         return;
       }
 
-      if (authMode === 'signup' && cpfRaw.length !== 11) {
-        showAuthError('Informe um CPF v\u00e1lido.');
-        return;
+      if (authMode === 'signup') {
+        if (cpfRaw.length !== 11) {
+          showAuthError('Informe um CPF v\u00e1lido.');
+          return;
+        }
+        if (!validarCPF(cpfRaw)) {
+          showAuthError('CPF inv\u00e1lido. Verifique os n\u00fameros.');
+          return;
+        }
       }
 
       if (password.length < 6) {
@@ -2396,6 +2406,25 @@
       const div = document.createElement('div');
       div.textContent = str;
       return div.innerHTML;
+    }
+
+    function validarCPF(cpf) {
+      cpf = cpf.replace(/\D/g, '');
+      if (cpf.length !== 11) return false;
+      // Rejeitar CPFs com todos dígitos iguais
+      if (/^(\d)\1{10}$/.test(cpf)) return false;
+      // Validar dígitos verificadores
+      var soma = 0, resto;
+      for (var i = 1; i <= 9; i++) soma += parseInt(cpf.substring(i-1, i)) * (11 - i);
+      resto = (soma * 10) % 11;
+      if (resto === 10 || resto === 11) resto = 0;
+      if (resto !== parseInt(cpf.substring(9, 10))) return false;
+      soma = 0;
+      for (var i = 1; i <= 10; i++) soma += parseInt(cpf.substring(i-1, i)) * (12 - i);
+      resto = (soma * 10) % 11;
+      if (resto === 10 || resto === 11) resto = 0;
+      if (resto !== parseInt(cpf.substring(10, 11))) return false;
+      return true;
     }
 
     // =============================================
