@@ -1558,12 +1558,11 @@
         <p class="loading-title" id="loading-title">Buscando empresas...</p>
         <div class="loading-progress-bar"><div class="loading-progress-fill" id="loading-progress"></div></div>
         <div class="loading-steps">
-          <div class="loading-step" id="lstep1"><div class="loading-step-icon"></div><div class="loading-step-text">Conectando ao Google Maps...</div></div>
-          <div class="loading-step" id="lstep2"><div class="loading-step-icon"></div><div class="loading-step-text">Pesquisando na regi&atilde;o...</div></div>
-          <div class="loading-step" id="lstep3"><div class="loading-step-icon"></div><div class="loading-step-text">Coletando dados das empresas...</div></div>
-          <div class="loading-step" id="lstep4"><div class="loading-step-icon"></div><div class="loading-step-text">Extraindo telefones...</div></div>
-          <div class="loading-step" id="lstep5"><div class="loading-step-icon"></div><div class="loading-step-text">Filtrando empresas com WhatsApp...</div></div>
-          <div class="loading-step" id="lstep6"><div class="loading-step-icon"></div><div class="loading-step-text">Organizando sua lista...</div></div>
+          <div class="loading-step" id="lstep1"><div class="loading-step-icon"></div><div class="loading-step-text">Pesquisando na regi&atilde;o...</div></div>
+          <div class="loading-step" id="lstep2"><div class="loading-step-icon"></div><div class="loading-step-text">Coletando dados das empresas...</div></div>
+          <div class="loading-step" id="lstep3"><div class="loading-step-icon"></div><div class="loading-step-text">Extraindo telefones...</div></div>
+          <div class="loading-step" id="lstep4"><div class="loading-step-icon"></div><div class="loading-step-text">Filtrando empresas com WhatsApp...</div></div>
+          <div class="loading-step" id="lstep5"><div class="loading-step-icon"></div><div class="loading-step-text">Organizando sua lista...</div></div>
         </div>
         <p class="loading-hint" id="loading-hint">Isso pode levar alguns segundos</p>
       </div>
@@ -2144,18 +2143,17 @@
     }
 
     var loadingSteps = [
-      { delay: 0, doneDelay: 2400, progress: 8 },
-      { delay: 2400, doneDelay: 6400, progress: 22 },
-      { delay: 6400, doneDelay: 11200, progress: 45 },
-      { delay: 11200, doneDelay: 15200, progress: 65 },
-      { delay: 15200, doneDelay: 19200, progress: 82 },
-      { delay: 19200, doneDelay: 22400, progress: 95 }
+      { delay: 0, doneDelay: 3200, progress: 10 },
+      { delay: 3200, doneDelay: 8000, progress: 30 },
+      { delay: 8000, doneDelay: 13000, progress: 55 },
+      { delay: 13000, doneDelay: 18000, progress: 78 },
+      { delay: 18000, doneDelay: 22400, progress: 95 }
     ];
     var loadingTimeouts = [];
 
     function startLoadingHints() {
-      var defaultTexts = ['Conectando ao Google Maps...', 'Pesquisando na regi\u00e3o...', 'Coletando dados das empresas...', 'Extraindo telefones...', 'Filtrando empresas com WhatsApp...', 'Organizando sua lista...'];
-      for (var i = 1; i <= 6; i++) {
+      var defaultTexts = ['Pesquisando na regi\u00e3o...', 'Coletando dados das empresas...', 'Extraindo telefones...', 'Filtrando empresas com WhatsApp...', 'Organizando sua lista...'];
+      for (var i = 1; i <= 5; i++) {
         var el = document.getElementById('lstep' + i);
         el.classList.remove('active', 'done');
         el.querySelector('.loading-step-text').textContent = defaultTexts[i - 1];
