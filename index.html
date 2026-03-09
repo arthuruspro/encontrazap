@@ -18,7 +18,7 @@
     :root {
       --primary: #25D366;
       --primary-dark: #128C7E;
-      --bg: #F4E6CD;
+      --bg: #ffffff;
       --text: #111827;
       --text-muted: #6b7280;
       --border: #e5e7eb;
@@ -280,7 +280,7 @@
     }
 
     .search-headline .hl-green {
-      color: #0B8043;
+      color: var(--primary);
     }
 
     .search-form {
@@ -350,6 +350,7 @@
       font-size: 13px;
       color: var(--text-muted);
       margin-top: 8px;
+      transition: opacity 0.3s ease;
     }
 
     .pulsing-dots::after {
@@ -1179,7 +1180,7 @@
       <div class="loading-container">
         <div class="spinner"></div>
         <p class="loading-text">Buscando empresas<span class="pulsing-dots"></span></p>
-        <p class="loading-hint">Isso pode levar até 20 segundos...</p>
+        <p class="loading-hint" id="loading-hint">Procurando empresas na regi&atilde;o...</p>
       </div>
     </div>
 
@@ -1510,6 +1511,7 @@
     var extraQty = 1;
     var currentPixCode = { sub: '', extras: '', auth: '' };
     var pollingInterval = null;
+    var loadingHintInterval = null;
     var previousScreen = 'search';
 
     // =============================================
@@ -1521,6 +1523,13 @@
       const target = document.getElementById('screen-' + name);
       if (target) {
         target.classList.add('active');
+      }
+
+      // Loading hints rotation
+      if (name === 'loading') {
+        startLoadingHints();
+      } else {
+        stopLoadingHints();
       }
 
       // Update state when showing screens
@@ -1627,6 +1636,40 @@
 
     function updateSearchBadge() {
       // Badge removido — usuário usa sem ver contador
+    }
+
+    var loadingHints = [
+      'Procurando empresas na regi\u00e3o...',
+      'Filtrando empresas com WhatsApp...',
+      'Estamos quase l\u00e1...',
+      'S\u00f3 mais alguns segundos...'
+    ];
+
+    function startLoadingHints() {
+      var hintEl = document.getElementById('loading-hint');
+      var idx = 0;
+      hintEl.textContent = loadingHints[0];
+      if (loadingHintInterval) clearInterval(loadingHintInterval);
+      loadingHintInterval = setInterval(function() {
+        idx++;
+        if (idx < loadingHints.length) {
+          hintEl.style.opacity = '0';
+          setTimeout(function() {
+            hintEl.textContent = loadingHints[idx];
+            hintEl.style.opacity = '1';
+          }, 300);
+        } else {
+          clearInterval(loadingHintInterval);
+          loadingHintInterval = null;
+        }
+      }, 5000);
+    }
+
+    function stopLoadingHints() {
+      if (loadingHintInterval) {
+        clearInterval(loadingHintInterval);
+        loadingHintInterval = null;
+      }
     }
 
     function updateResultsBadges() {
