@@ -1603,8 +1603,8 @@
       </button>
 
       <!-- Banner para free users: upsell envio em massa -->
-      <div id="dispatch-upsell" style="display:none; margin:8px 16px 4px; padding:12px 16px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px; text-align:center;">
-        <p style="font-size:13px; color:var(--text-muted); margin-bottom:8px;">&#128274; Envio em massa n&atilde;o dispon&iacute;vel no plano gratuito</p>
+      <div id="dispatch-upsell" style="display:none; margin:8px 16px 4px; padding:12px 16px; background:#fef2f2; border:1px solid #fecaca; border-radius:12px; text-align:center;">
+        <p style="font-size:13px; color:#991b1b; margin-bottom:8px;">&#128274; Envio em massa n&atilde;o dispon&iacute;vel no plano gratuito</p>
         <button onclick="showScreen('limit')" style="background:none; border:none; color:var(--primary-dark); font-weight:700; font-size:14px; cursor:pointer; font-family:inherit; padding:4px 0;">Ativar plano &rarr;</button>
       </div>
 
@@ -2158,7 +2158,8 @@
         el.querySelector('.loading-step-text').textContent = defaultTexts[i - 1];
       }
       document.getElementById('loading-progress').style.width = '0%';
-      document.getElementById('loading-hint').textContent = 'Isso pode levar alguns segundos';
+      document.getElementById('loading-hint').textContent = '';
+      document.getElementById('loading-hint').style.opacity = '0';
 
       loadingSteps.forEach(function(step, idx) {
         var stepNum = idx + 1;
@@ -2174,12 +2175,13 @@
         }, step.doneDelay));
       });
 
+      // Hints só aparecem após o último check carregar (22400ms)
+      var lastStepDone = 22400;
       var hints = [
-        { t: 4000, msg: 'Analisando resultados do Google Maps...' },
-        { t: 9000, msg: 'Verificando n\u00fameros de celular...' },
-        { t: 14000, msg: 'Estamos quase l\u00e1!' },
-        { t: 18000, msg: 'S\u00f3 mais um instante...' },
-        { t: 24000, msg: 'Quase pronto, aguarde...' }
+        { t: lastStepDone, msg: 'Isso pode levar alguns segundos...' },
+        { t: lastStepDone + 4000, msg: 'Estamos quase l\u00e1!' },
+        { t: lastStepDone + 8000, msg: 'S\u00f3 mais um instante...' },
+        { t: lastStepDone + 13000, msg: 'Quase pronto, aguarde...' }
       ];
       hints.forEach(function(h) {
         loadingTimeouts.push(setTimeout(function() {
@@ -2822,9 +2824,19 @@
 
     async function fetchUserProfile() {
       if (!currentUser) return;
+      // Garantir que o session está atualizado antes de buscar
+      try {
+        await sb.auth.refreshSession();
+      } catch (e) {
+        console.warn('[EncontraZap] refreshSession before profile fetch:', e);
+      }
       const { data, error } = await sb.from('users').select('*').eq('id', currentUser.id).single();
+      console.log('[EncontraZap] fetchUserProfile:', { data, error, plan: data?.plan });
       if (data) {
         userProfile = data;
+      } else if (error) {
+        console.error('[EncontraZap] Profile fetch error:', error);
+        // Se deu erro de permissão, não criar perfil novo — pode ser RLS
       } else {
         // Profile doesn't exist yet, create
         await initUserProfile();
@@ -3076,7 +3088,7 @@
       }
 
       try {
-        const { data, error } = await supabase
+        const { data, error } = await sb
           .from('searches')
           .select('*')
           .eq('user_id', currentUser.id)
