@@ -1770,6 +1770,12 @@
       const list = document.getElementById('leads-list');
       list.innerHTML = '';
 
+      // Nenhum resultado
+      if (!leads || leads.length === 0) {
+        list.innerHTML = '<div style="text-align:center; padding:48px 24px;"><div style="font-size:48px; margin-bottom:16px;">&#128533;</div><p style="font-size:16px; font-weight:600; color:var(--text); margin-bottom:8px;">Nenhum resultado encontrado</p><p style="font-size:14px; color:var(--text-muted); line-height:1.5;">N\u00e3o encontramos empresas com WhatsApp para \u201c' + escapeHtml(currentCategory) + '\u201d em \u201c' + escapeHtml(currentLocation) + '\u201d. Tente outra categoria ou cidade.</p></div>';
+        return;
+      }
+
       const contacted = getContactedSet();
 
       leads.forEach((lead, i) => {
