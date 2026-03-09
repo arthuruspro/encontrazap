@@ -663,73 +663,102 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 48px 24px 24px;
+      justify-content: center;
+      padding: 32px 24px 24px;
       text-align: center;
     }
 
-    .limit-icon {
-      font-size: 56px;
-      margin-bottom: 16px;
+    .limit-card {
+      width: 100%;
+      background: #fff;
+      border: 2px solid var(--border);
+      border-radius: 20px;
+      padding: 32px 24px 24px;
+      text-align: center;
+    }
+
+    .limit-emoji {
+      font-size: 40px;
+      margin-bottom: 12px;
     }
 
     .limit-title {
-      font-size: 22px;
-      font-weight: 800;
-      margin-bottom: 8px;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
     }
 
     .limit-subtitle {
-      font-size: 14px;
+      font-size: 13px;
       color: var(--text-muted);
-      margin-bottom: 24px;
-      line-height: 1.5;
+      margin-bottom: 20px;
+      line-height: 1.4;
     }
 
-    .limit-price {
-      font-size: 36px;
+    .limit-price-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 2px;
+      margin-bottom: 20px;
+    }
+
+    .limit-price-value {
+      font-size: 32px;
       font-weight: 800;
-      color: var(--primary);
-      margin-bottom: 4px;
+      color: var(--text);
     }
 
     .limit-price-period {
       font-size: 14px;
+      font-weight: 500;
       color: var(--text-muted);
-      margin-bottom: 24px;
+    }
+
+    .limit-divider {
+      width: 100%;
+      height: 1px;
+      background: var(--border);
+      margin-bottom: 16px;
     }
 
     .features-list {
       width: 100%;
       text-align: left;
-      margin-bottom: 32px;
+      margin-bottom: 24px;
     }
 
     .feature-item {
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 10px 0;
+      padding: 7px 0;
       font-size: 14px;
       color: var(--text);
     }
 
     .feature-check {
-      width: 22px;
-      height: 22px;
-      background: #dcfce7;
-      color: var(--success);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      font-weight: 700;
+      color: var(--primary);
+      font-size: 16px;
       flex-shrink: 0;
+      line-height: 1;
     }
 
     .limit-actions {
       width: 100%;
-      margin-top: auto;
+    }
+
+    .limit-back {
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      padding: 8px;
+      -webkit-tap-highlight-color: transparent;
     }
 
     /* ---- AUTH SCREEN ---- */
@@ -1300,35 +1329,42 @@
     <!-- ==================== LIMIT SCREEN ==================== -->
     <div class="screen" id="screen-limit">
       <div class="limit-container">
-        <div class="limit-icon">&#128274;</div>
-        <h2 class="limit-title">Suas buscas gr&aacute;tis acabaram!</h2>
-        <p class="limit-subtitle">Assine o EncontraZap e tenha 20 buscas por m&ecirc;s</p>
+        <div class="limit-card">
+          <div class="limit-emoji">&#128170;</div>
+          <h2 class="limit-title">Suas buscas gr&aacute;tis acabaram!</h2>
+          <p class="limit-subtitle">Continue encontrando empresas com o plano mensal</p>
 
-        <div class="limit-price">R$ 97<span style="font-size:18px; font-weight:600;">/m&ecirc;s</span></div>
+          <div class="limit-price-row">
+            <span class="limit-price-value">R$97</span>
+            <span class="limit-price-period">/m&ecirc;s</span>
+          </div>
 
-        <div class="features-list">
-          <div class="feature-item">
-            <div class="feature-check">&#10003;</div>
-            <span>20 buscas por m&ecirc;s</span>
+          <div class="limit-divider"></div>
+
+          <div class="features-list">
+            <div class="feature-item">
+              <span class="feature-check">&#10003;</span>
+              <span>20 buscas por m&ecirc;s</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-check">&#10003;</span>
+              <span>Contato direto via WhatsApp</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-check">&#10003;</span>
+              <span>Hist&oacute;rico de buscas</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-check">&#10003;</span>
+              <span>Buscas extras por R$4,90</span>
+            </div>
           </div>
-          <div class="feature-item">
-            <div class="feature-check">&#10003;</div>
-            <span>At&eacute; 400 leads/m&ecirc;s</span>
-          </div>
-          <div class="feature-item">
-            <div class="feature-check">&#10003;</div>
-            <span>Hist&oacute;rico de buscas</span>
-          </div>
-          <div class="feature-item">
-            <div class="feature-check">&#10003;</div>
-            <span>Buscas extras por R$4,90</span>
+
+          <div class="limit-actions">
+            <button class="btn btn-primary" onclick="showScreen('auth')">Assinar agora</button>
           </div>
         </div>
-
-        <div class="limit-actions">
-          <button class="btn btn-primary" onclick="showScreen('auth')">Assinar agora</button>
-          <button class="btn btn-secondary mt-8" onclick="showScreen('search')">Voltar</button>
-        </div>
+        <button class="limit-back" onclick="showScreen('search')">Voltar</button>
       </div>
     </div>
 
