@@ -1630,13 +1630,7 @@
     }
 
     function updateResultsBadges() {
-      const searches = getSearchesLeft();
-      const text = searches + ' busca' + (searches !== 1 ? 's' : '');
-      const cls = 'badge ' + getBadgeClass(searches);
-
-      const b1 = document.getElementById('results-badge');
-      b1.textContent = text;
-      b1.className = cls;
+      // Badge removido da tela de resultados
     }
 
     function updateTemplateBar() {
