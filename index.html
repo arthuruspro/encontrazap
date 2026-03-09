@@ -1397,10 +1397,12 @@
         <p class="loading-title" id="loading-title">Buscando empresas...</p>
         <div class="loading-progress-bar"><div class="loading-progress-fill" id="loading-progress"></div></div>
         <div class="loading-steps">
-          <div class="loading-step" id="lstep1"><div class="loading-step-icon"></div><div class="loading-step-text">Pesquisando na regi&atilde;o...</div></div>
-          <div class="loading-step" id="lstep2"><div class="loading-step-icon"></div><div class="loading-step-text">Coletando dados das empresas...</div></div>
-          <div class="loading-step" id="lstep3"><div class="loading-step-icon"></div><div class="loading-step-text">Filtrando empresas com WhatsApp...</div></div>
-          <div class="loading-step" id="lstep4"><div class="loading-step-icon"></div><div class="loading-step-text">Organizando sua lista de leads...</div></div>
+          <div class="loading-step" id="lstep1"><div class="loading-step-icon"></div><div class="loading-step-text">Conectando ao Google Maps...</div></div>
+          <div class="loading-step" id="lstep2"><div class="loading-step-icon"></div><div class="loading-step-text">Pesquisando na regi&atilde;o...</div></div>
+          <div class="loading-step" id="lstep3"><div class="loading-step-icon"></div><div class="loading-step-text">Coletando dados das empresas...</div></div>
+          <div class="loading-step" id="lstep4"><div class="loading-step-icon"></div><div class="loading-step-text">Extraindo telefones...</div></div>
+          <div class="loading-step" id="lstep5"><div class="loading-step-icon"></div><div class="loading-step-text">Filtrando empresas com WhatsApp...</div></div>
+          <div class="loading-step" id="lstep6"><div class="loading-step-icon"></div><div class="loading-step-text">Organizando sua lista...</div></div>
         </div>
         <p class="loading-hint" id="loading-hint">Isso pode levar alguns segundos</p>
       </div>
@@ -1928,19 +1930,21 @@
     }
 
     var loadingSteps = [
-      { delay: 0, doneDelay: 4000, progress: 15 },
-      { delay: 4000, doneDelay: 9000, progress: 40 },
-      { delay: 9000, doneDelay: 14000, progress: 70 },
-      { delay: 14000, doneDelay: 18000, progress: 95 }
+      { delay: 0, doneDelay: 3000, progress: 8 },
+      { delay: 3000, doneDelay: 8000, progress: 22 },
+      { delay: 8000, doneDelay: 14000, progress: 45 },
+      { delay: 14000, doneDelay: 19000, progress: 65 },
+      { delay: 19000, doneDelay: 24000, progress: 82 },
+      { delay: 24000, doneDelay: 28000, progress: 95 }
     ];
     var loadingTimeouts = [];
 
     function startLoadingHints() {
-      for (var i = 1; i <= 4; i++) {
+      var defaultTexts = ['Conectando ao Google Maps...', 'Pesquisando na regi\u00e3o...', 'Coletando dados das empresas...', 'Extraindo telefones...', 'Filtrando empresas com WhatsApp...', 'Organizando sua lista...'];
+      for (var i = 1; i <= 6; i++) {
         var el = document.getElementById('lstep' + i);
         el.classList.remove('active', 'done');
-        var texts = ['Pesquisando na regi\u00e3o...', 'Coletando dados das empresas...', 'Filtrando empresas com WhatsApp...', 'Organizando sua lista...'];
-        el.querySelector('.loading-step-text').textContent = texts[i - 1];
+        el.querySelector('.loading-step-text').textContent = defaultTexts[i - 1];
       }
       document.getElementById('loading-progress').style.width = '0%';
       document.getElementById('loading-hint').textContent = 'Isso pode levar alguns segundos';
@@ -1960,10 +1964,11 @@
       });
 
       var hints = [
-        { t: 6000, msg: 'Filtrando s\u00f3 as que t\u00eam WhatsApp...' },
-        { t: 12000, msg: 'Estamos quase l\u00e1!' },
-        { t: 18000, msg: 'S\u00f3 mais um instante...' },
-        { t: 24000, msg: 'Quase pronto, aguarde...' }
+        { t: 5000, msg: 'Analisando resultados do Google Maps...' },
+        { t: 11000, msg: 'Verificando n\u00fameros de celular...' },
+        { t: 17000, msg: 'Estamos quase l\u00e1!' },
+        { t: 23000, msg: 'S\u00f3 mais um instante...' },
+        { t: 30000, msg: 'Quase pronto, aguarde...' }
       ];
       hints.forEach(function(h) {
         loadingTimeouts.push(setTimeout(function() {
@@ -1981,7 +1986,7 @@
           pulse = !pulse;
         }, 1200);
         loadingTimeouts.push(pulseInt);
-      }, 19000));
+      }, 29000));
     }
 
     function stopLoadingHints() {
