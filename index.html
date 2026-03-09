@@ -1584,6 +1584,17 @@
         </button>
       </div>
 
+      <!-- Botão de disparo sequencial (só aparece se tem leads não contactados) -->
+      <button class="btn-start-dispatch" id="btn-start-dispatch" onclick="startMassDispatch()" style="display:none;">
+        &#128640; Envio em massa com 1 clique
+      </button>
+
+      <!-- Banner para free users: upsell envio em massa -->
+      <div id="dispatch-upsell" style="display:none; margin:8px 16px 4px; padding:12px 16px; background:#fef2f2; border:1px solid #fecaca; border-radius:12px; text-align:center;">
+        <p style="font-size:13px; color:#991b1b; margin-bottom:8px;">&#128274; Envio em massa n&atilde;o dispon&iacute;vel no plano gratuito</p>
+        <button onclick="showScreen('limit')" style="background:none; border:none; color:var(--primary-dark); font-weight:700; font-size:14px; cursor:pointer; font-family:inherit; padding:4px 0;">Ativar plano &rarr;</button>
+      </div>
+
       <div class="template-bar" onclick="showScreen('template')">
         <span class="template-bar-icon">&#128172;</span>
         <span class="template-bar-text" id="template-bar-text"></span>
@@ -1596,17 +1607,6 @@
           Ocultar contatados
           <div class="toggle-switch" id="toggle-switch"></div>
         </button>
-      </div>
-
-      <!-- Botão de disparo sequencial (só aparece se tem leads não contactados) -->
-      <button class="btn-start-dispatch" id="btn-start-dispatch" onclick="startMassDispatch()" style="display:none;">
-        &#128640; Envio em massa com 1 clique
-      </button>
-
-      <!-- Banner para free users: upsell envio em massa -->
-      <div id="dispatch-upsell" style="display:none; margin:8px 16px 4px; padding:12px 16px; background:#fef2f2; border:1px solid #fecaca; border-radius:12px; text-align:center;">
-        <p style="font-size:13px; color:#991b1b; margin-bottom:8px;">&#128274; Envio em massa n&atilde;o dispon&iacute;vel no plano gratuito</p>
-        <button onclick="showScreen('limit')" style="background:none; border:none; color:var(--primary-dark); font-weight:700; font-size:14px; cursor:pointer; font-family:inherit; padding:4px 0;">Ativar plano &rarr;</button>
       </div>
 
       <div class="leads-list" id="leads-list"></div>
