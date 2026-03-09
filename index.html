@@ -1937,9 +1937,13 @@
 
         // Add auth header if logged in (refresh token to avoid 401)
         if (currentUser) {
-          const { data: { session } } = await sb.auth.refreshSession();
-          if (session) {
-            headers['Authorization'] = 'Bearer ' + session.access_token;
+          try {
+            const { data: { session }, error } = await sb.auth.refreshSession();
+            if (session && !error) {
+              headers['Authorization'] = 'Bearer ' + session.access_token;
+            }
+          } catch (authErr) {
+            console.warn('Auth refresh failed, searching as anon:', authErr);
           }
         }
 
