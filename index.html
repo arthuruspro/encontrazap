@@ -1657,7 +1657,7 @@
 
       <div class="template-container">
         <div class="tip-box">
-          &#128161; Use <strong>{empresa}</strong> para inserir o nome do lead automaticamente.
+          &#128161; Use <strong>{empresa}</strong> para o nome e <strong>{cidade}</strong> para a cidade buscada.
         </div>
 
         <div class="input-group">
@@ -2101,7 +2101,9 @@
     }
 
     function renderTemplate(template, name) {
-      return template.replace(/\{empresa\}/g, name || '{empresa}');
+      return template
+        .replace(/\{empresa\}/g, name || '{empresa}')
+        .replace(/\{cidade\}/g, currentLocation || '{cidade}');
     }
 
     // =============================================
