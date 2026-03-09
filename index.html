@@ -333,6 +333,11 @@
       color: var(--text-muted);
     }
 
+    .searches-left-hint {
+      font-size: 12px;
+      color: #d1d5db;
+    }
+
     .search-badge-row {
       display: flex;
       align-items: center;
@@ -1209,7 +1214,9 @@
           </div>
         </div>
 
-        <div class="search-footer"></div>
+        <div class="search-footer">
+          <span class="searches-left-hint" id="searches-left-hint"></span>
+        </div>
       </div>
     </div>
 
@@ -1684,7 +1691,10 @@
     }
 
     function updateSearchBadge() {
-      // Badge removido — usuário usa sem ver contador
+      var el = document.getElementById('searches-left-hint');
+      if (!el) return;
+      var left = getSearchesLeft();
+      el.textContent = left + ' busca' + (left !== 1 ? 's' : '') + ' restante' + (left !== 1 ? 's' : '');
     }
 
     var loadingHints = [
