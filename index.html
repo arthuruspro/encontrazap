@@ -333,6 +333,12 @@
       color: var(--text);
     }
 
+    .loading-hint {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+
     .pulsing-dots::after {
       content: '';
       animation: dots 1.5s steps(4, end) infinite;
@@ -1175,6 +1181,7 @@
       <div class="loading-container">
         <div class="spinner"></div>
         <p class="loading-text">Buscando leads<span class="pulsing-dots"></span></p>
+        <p class="loading-hint">Isso pode levar até 20 segundos...</p>
       </div>
     </div>
 
