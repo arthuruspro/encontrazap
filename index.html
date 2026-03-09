@@ -1425,37 +1425,46 @@
   </div><!-- /app -->
 
   <script>
+  (function() {
+    'use strict';
+
+    // Guard: esperar SDK carregar
+    if (!window.supabase || !window.supabase.createClient) {
+      console.error('[EncontraZap] Supabase SDK nao carregou');
+      return;
+    }
+
     // =============================================
     // CONFIG
     // =============================================
-    const SUPABASE_URL = 'https://gejxnfusnzjijecsewoi.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdlanhuZnVzbnpqaWplY3Nld29pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwMjY5MTYsImV4cCI6MjA4ODYwMjkxNn0.cOGD6TG8gtn9LAWD6KQ0f5XwXKhiHowk7FPTSRKO1Mw';
-    const EDGE_FN_BASE = SUPABASE_URL + '/functions/v1';
+    var SUPABASE_URL = 'https://gejxnfusnzjijecsewoi.supabase.co';
+    var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdlanhuZnVzbnpqaWplY3Nld29pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwMjY5MTYsImV4cCI6MjA4ODYwMjkxNn0.cOGD6TG8gtn9LAWD6KQ0f5XwXKhiHowk7FPTSRKO1Mw';
+    var EDGE_FN_BASE = SUPABASE_URL + '/functions/v1';
 
-    const DEFAULT_TEMPLATE = 'Ol\u00e1, tudo bem? Vi a {empresa} no Google e gostaria de conversar sobre uma oportunidade. Posso te explicar em 2 minutos?';
-    const DEFAULT_FREE_SEARCHES = 3;
-    const PAID_MONTHLY_SEARCHES = 20;
-    const EXTRA_PRICE = 4.90;
+    var DEFAULT_TEMPLATE = 'Ol\u00e1, tudo bem? Vi a {empresa} no Google e gostaria de conversar sobre uma oportunidade. Posso te explicar em 2 minutos?';
+    var DEFAULT_FREE_SEARCHES = 3;
+    var PAID_MONTHLY_SEARCHES = 20;
+    var EXTRA_PRICE = 4.90;
 
     // =============================================
     // SUPABASE CLIENT
     // =============================================
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // =============================================
     // STATE
     // =============================================
-    let currentUser = null;
-    let userProfile = null; // { searches_left, plan, template }
-    let currentLeads = [];
-    let currentCategory = '';
-    let currentLocation = '';
-    let authMode = 'signup'; // 'signup' | 'login'
-    let hideContacted = false;
-    let extraQty = 1;
-    let currentPixCode = { sub: '', extras: '' };
-    let pollingInterval = null;
-    let previousScreen = 'search';
+    var currentUser = null;
+    var userProfile = null; // { searches_left, plan, template }
+    var currentLeads = [];
+    var currentCategory = '';
+    var currentLocation = '';
+    var authMode = 'signup'; // 'signup' | 'login'
+    var hideContacted = false;
+    var extraQty = 1;
+    var currentPixCode = { sub: '', extras: '' };
+    var pollingInterval = null;
+    var previousScreen = 'search';
 
     // =============================================
     // SCREEN MANAGEMENT
@@ -1506,7 +1515,7 @@
         userProfile.searches_left = val;
         // Also update Supabase in background
         if (currentUser) {
-          supabase.from('users').update({ searches_left: val }).eq('id', currentUser.id).then(() => {});
+          sb.from('users').update({ searches_left: val }).eq('id', currentUser.id).then(() => {});
         }
       } else {
         localStorage.setItem('ez_searches_left', val);
@@ -1530,7 +1539,7 @@
       if (userProfile) {
         userProfile.template = val;
         if (currentUser) {
-          supabase.from('users').update({ template: val }).eq('id', currentUser.id).then(() => {});
+          sb.from('users').update({ template: val }).eq('id', currentUser.id).then(() => {});
         }
       }
     }
@@ -1646,7 +1655,7 @@
 
         // Add auth header if logged in
         if (currentUser) {
-          const { data: { session } } = await supabase.auth.getSession();
+          const { data: { session } } = await sb.auth.getSession();
           if (session) {
             headers['Authorization'] = 'Bearer ' + session.access_token;
           }
@@ -1882,13 +1891,13 @@
 
       try {
         if (authMode === 'signup') {
-          const { data, error } = await supabase.auth.signUp({ email, password });
+          const { data, error } = await sb.auth.signUp({ email, password });
           if (error) throw error;
           currentUser = data.user;
           await initUserProfile();
           showScreen('subscribe');
         } else {
-          const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+          const { data, error } = await sb.auth.signInWithPassword({ email, password });
           if (error) throw error;
           currentUser = data.user;
           await fetchUserProfile();
@@ -1930,7 +1939,7 @@
       };
 
       // Insert into Supabase (upsert)
-      await supabase.from('users').upsert({
+      await sb.from('users').upsert({
         id: currentUser.id,
         email: currentUser.email,
         searches_left: freeLeft,
@@ -1942,7 +1951,7 @@
 
     async function fetchUserProfile() {
       if (!currentUser) return;
-      const { data, error } = await supabase.from('users').select('*').eq('id', currentUser.id).single();
+      const { data, error } = await sb.from('users').select('*').eq('id', currentUser.id).single();
       if (data) {
         userProfile = data;
       } else {
@@ -1960,7 +1969,7 @@
       btn.textContent = 'Gerando PIX...';
 
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await sb.auth.getSession();
         const resp = await fetch(EDGE_FN_BASE + '/encontrazap-subscribe', {
           method: 'POST',
           headers: {
@@ -2022,7 +2031,7 @@
 
       pollingInterval = setInterval(async () => {
         try {
-          const { data: { session } } = await supabase.auth.getSession();
+          const { data: { session } } = await sb.auth.getSession();
           const resp = await fetch(EDGE_FN_BASE + '/encontrazap-verify-payment', {
             method: 'POST',
             headers: {
@@ -2114,7 +2123,7 @@
       btn.textContent = 'Gerando PIX...';
 
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await sb.auth.getSession();
         const resp = await fetch(EDGE_FN_BASE + '/encontrazap-buy-extra', {
           method: 'POST',
           headers: {
@@ -2239,7 +2248,7 @@
     async function init() {
       // Check auth session
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await sb.auth.getSession();
         if (session && session.user) {
           currentUser = session.user;
           await fetchUserProfile();
@@ -2256,7 +2265,7 @@
       showScreen('search');
 
       // Listen for auth state changes
-      supabase.auth.onAuthStateChange((event, session) => {
+      sb.auth.onAuthStateChange((event, session) => {
         if (session && session.user) {
           currentUser = session.user;
         } else {
@@ -2274,6 +2283,7 @@
 
     // Run init
     init();
+  })();
   </script>
 </body>
 </html>
