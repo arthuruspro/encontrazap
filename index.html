@@ -1949,11 +1949,16 @@
           body: JSON.stringify({ category, location })
         });
 
+        const data = await resp.json();
+
         if (!resp.ok) {
-          throw new Error('Erro na busca: ' + resp.status);
+          if (resp.status === 402 || data.code === 'NO_SEARCHES') {
+            if (isPaidUser()) { showExtrasModal(); } else { showScreen('limit'); }
+            return;
+          }
+          throw new Error(data.error || 'Erro na busca: ' + resp.status);
         }
 
-        const data = await resp.json();
         currentLeads = data.leads || [];
 
         // Decrement searches
