@@ -1706,20 +1706,16 @@
         updateSearchBadge();
         // Restaurar visibilidade do campo cidade e botão se valores já preenchidos
         var catVal = document.getElementById('input-category').value.trim();
-        var locVal = document.getElementById('input-location').value.trim();
         var locGroup = document.getElementById('location-group');
         var locHint = document.getElementById('location-hint');
         var searchBtnGroup = document.getElementById('search-btn-group');
         if (catVal.length >= 3) {
           locHint.classList.add('visible');
           locGroup.classList.add('visible');
+          searchBtnGroup.classList.add('visible');
         } else {
           locHint.classList.remove('visible');
           locGroup.classList.remove('visible');
-        }
-        if (catVal && locVal.length >= 2) {
-          searchBtnGroup.classList.add('visible');
-        } else {
           searchBtnGroup.classList.remove('visible');
         }
       }
@@ -1878,14 +1874,6 @@
       const cat = document.getElementById('input-category').value.trim();
       const loc = document.getElementById('input-location').value.trim();
       document.getElementById('btn-search').disabled = !(cat && loc);
-
-      // Mostrar botão de busca somente quando cidade é preenchida
-      var searchBtnGroup = document.getElementById('search-btn-group');
-      if (cat && loc.length >= 2) {
-        searchBtnGroup.classList.add('visible');
-      } else {
-        searchBtnGroup.classList.remove('visible');
-      }
     }
 
     document.getElementById('input-category').addEventListener('input', function() {
@@ -1893,14 +1881,17 @@
       var cat = document.getElementById('input-category').value.trim();
       var locationGroup = document.getElementById('location-group');
       var locationHint = document.getElementById('location-hint');
+      var searchBtnGroup = document.getElementById('search-btn-group');
       if (cat.length >= 3) {
         if (!locationGroup.classList.contains('visible')) {
           locationHint.classList.add('visible');
           locationGroup.classList.add('visible');
+          searchBtnGroup.classList.add('visible');
         }
       } else {
         locationHint.classList.remove('visible');
         locationGroup.classList.remove('visible');
+        searchBtnGroup.classList.remove('visible');
       }
     });
     document.getElementById('input-location').addEventListener('input', updateSearchBtn);
