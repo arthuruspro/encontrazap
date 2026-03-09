@@ -1128,8 +1128,9 @@
 
           <div class="search-badge-row">
             <span class="badge badge-green" id="search-badge">3 buscas restantes</span>
-            <button class="history-link" id="btn-history" style="display: none;">&#128203; Hist&oacute;rico</button>
           </div>
+
+          <button class="btn btn-secondary" id="btn-history" style="display: none;" onclick="loadLastResults()">&#128203; Ver &uacute;ltima busca</button>
         </div>
 
         <div class="search-footer">
@@ -1561,7 +1562,23 @@
 
     function updateHistoryBtnVisibility() {
       const btn = document.getElementById('btn-history');
-      btn.style.display = currentUser ? 'inline' : 'none';
+      const lastResults = localStorage.getItem('ez_last_results');
+      btn.style.display = lastResults ? '' : 'none';
+    }
+
+    function loadLastResults() {
+      try {
+        const saved = JSON.parse(localStorage.getItem('ez_last_results') || '{}');
+        if (saved.leads && saved.leads.length > 0) {
+          currentLeads = saved.leads;
+          currentCategory = saved.category || '';
+          currentLocation = saved.location || '';
+          renderResults(currentLeads);
+          showScreen('results');
+        }
+      } catch(e) {
+        console.error('Erro ao carregar histórico:', e);
+      }
     }
 
     function updateTemplateBar() {
@@ -1902,11 +1919,19 @@
     // =============================================
     async function handleSubscribe() {
       const btn = document.getElementById('btn-generate-pix');
+
+      // Verificar se está logado
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) {
+        alert('Você precisa criar uma conta antes de assinar.');
+        showScreen('auth');
+        return;
+      }
+
       btn.disabled = true;
       btn.textContent = 'Gerando PIX...';
 
       try {
-        const { data: { session } } = await sb.auth.getSession();
         const resp = await fetch(EDGE_FN_BASE + '/encontrazap-subscribe', {
           method: 'POST',
           headers: {
@@ -1917,7 +1942,10 @@
           body: JSON.stringify({ plan: 'monthly' })
         });
 
-        if (!resp.ok) throw new Error('Erro ao gerar PIX');
+        if (!resp.ok) {
+          const errBody = await resp.json().catch(() => ({}));
+          throw new Error(errBody.error || 'Erro ao gerar PIX');
+        }
         const data = await resp.json();
 
         // Show QR
@@ -2213,13 +2241,9 @@
       });
     }
 
-    // History button click
-    document.getElementById('btn-history').addEventListener('click', () => {
-      showScreen('history');
-    });
-
     // Expor funções pro escopo global (usadas em onclick no HTML)
     window.showScreen = showScreen;
+    window.loadLastResults = loadLastResults;
     window.toggleHideContacted = toggleHideContacted;
     window.handleWhatsAppClick = handleWhatsAppClick;
     window.goBackFromTemplate = goBackFromTemplate;
