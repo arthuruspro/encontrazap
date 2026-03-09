@@ -1737,8 +1737,7 @@
               <span class="lead-contacted-check">&#10004;</span>
             </div>
             <div class="lead-meta">
-              ${rating > 0 ? `<span class="lead-rating ${ratingClass}">\u2b50 ${rating.toFixed(1)}</span> \u00b7` : ''}
-              ${lead.reviews ? `${lead.reviews} avalia\u00e7\u00f5es \u00b7` : ''}
+              ${rating > 0 ? `<span class="lead-rating ${ratingClass}">\u2b50 ${rating.toFixed(1)}${lead.reviews ? ` (${lead.reviews})` : ''}</span> \u00b7 ` : ''}
               ${lead.address ? escapeHtml(lead.address) : ''}
             </div>
           </div>
