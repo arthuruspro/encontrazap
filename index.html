@@ -1928,10 +1928,10 @@
     }
 
     var loadingSteps = [
-      { delay: 0, doneDelay: 2000, progress: 15 },
-      { delay: 2000, doneDelay: 5000, progress: 40 },
-      { delay: 5000, doneDelay: 8000, progress: 70 },
-      { delay: 8000, doneDelay: 11000, progress: 95 }
+      { delay: 0, doneDelay: 4000, progress: 15 },
+      { delay: 4000, doneDelay: 9000, progress: 40 },
+      { delay: 9000, doneDelay: 14000, progress: 70 },
+      { delay: 14000, doneDelay: 18000, progress: 95 }
     ];
     var loadingTimeouts = [];
 
@@ -1960,10 +1960,10 @@
       });
 
       var hints = [
-        { t: 4000, msg: 'Filtrando s\u00f3 as que t\u00eam WhatsApp...' },
-        { t: 9000, msg: 'Estamos quase l\u00e1!' },
-        { t: 14000, msg: 'S\u00f3 mais um instante...' },
-        { t: 20000, msg: 'Quase pronto, aguarde...' }
+        { t: 6000, msg: 'Filtrando s\u00f3 as que t\u00eam WhatsApp...' },
+        { t: 12000, msg: 'Estamos quase l\u00e1!' },
+        { t: 18000, msg: 'S\u00f3 mais um instante...' },
+        { t: 24000, msg: 'Quase pronto, aguarde...' }
       ];
       hints.forEach(function(h) {
         loadingTimeouts.push(setTimeout(function() {
@@ -1981,7 +1981,7 @@
           pulse = !pulse;
         }, 1200);
         loadingTimeouts.push(pulseInt);
-      }, 12000));
+      }, 19000));
     }
 
     function stopLoadingHints() {
