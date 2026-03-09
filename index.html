@@ -128,7 +128,7 @@
       margin-bottom: 10px;
     }
 
-    .input-group.slide-in {
+    .input-group.slide-in, .slide-in-hint, .slide-in-btn {
       max-height: 0;
       opacity: 0;
       overflow: hidden;
@@ -142,7 +142,40 @@
       margin-bottom: 10px;
     }
 
-    .slide-in-hint {
+    .slide-in-hint.visible {
+      max-height: 30px;
+      opacity: 1;
+      margin-bottom: 10px;
+    }
+
+    .slide-in-btn.visible {
+      max-height: 60px;
+      opacity: 1;
+      margin-bottom: 10px;
+    }
+
+    /* Search icon inside category input */
+    .input-with-icon {
+      position: relative;
+    }
+
+    .input-with-icon .input-field {
+      padding-right: 48px;
+    }
+
+    .input-icon-right {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #9ca3af;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Progressive auth form */
+    .auth-field-group {
       max-height: 0;
       opacity: 0;
       overflow: hidden;
@@ -150,8 +183,14 @@
       transition: max-height 0.35s ease, opacity 0.3s ease, margin-bottom 0.3s ease;
     }
 
-    .slide-in-hint.visible {
-      max-height: 30px;
+    .auth-field-group.visible {
+      max-height: 80px;
+      opacity: 1;
+      margin-bottom: 10px;
+    }
+
+    .auth-field-group.visible-large {
+      max-height: 100px;
       opacity: 1;
       margin-bottom: 10px;
     }
@@ -690,17 +729,17 @@
     }
 
     .limit-title {
-      font-size: 18px;
+      font-size: 22px;
       font-weight: 700;
       color: var(--text);
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
 
     .limit-subtitle {
-      font-size: 13px;
+      font-size: 15px;
       color: var(--text-muted);
-      margin-bottom: 20px;
-      line-height: 1.4;
+      margin-bottom: 22px;
+      line-height: 1.5;
     }
 
     .limit-price-row {
@@ -712,13 +751,13 @@
     }
 
     .limit-price-value {
-      font-size: 32px;
+      font-size: 38px;
       font-weight: 800;
       color: var(--text);
     }
 
     .limit-price-period {
-      font-size: 14px;
+      font-size: 16px;
       font-weight: 500;
       color: var(--text-muted);
     }
@@ -740,14 +779,14 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 7px 0;
-      font-size: 14px;
+      padding: 8px 0;
+      font-size: 16px;
       color: var(--text);
     }
 
     .feature-check {
       color: var(--primary);
-      font-size: 16px;
+      font-size: 18px;
       flex-shrink: 0;
       line-height: 1;
     }
@@ -1236,14 +1275,17 @@
 
         <div class="search-form">
           <p class="search-form-hint">Qual tipo de empresa voc&ecirc; quer encontrar?</p>
-          <div class="input-group">
+          <div class="input-group input-with-icon">
             <input class="input-field" id="input-category" type="text" placeholder="Ex: barbearias, restaurantes, cl&iacute;nicas..." inputmode="text" autocomplete="off">
+            <span class="input-icon-right"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
           </div>
           <p class="search-form-hint slide-in-hint" id="location-hint">Em qual cidade?</p>
           <div class="input-group slide-in" id="location-group">
             <input class="input-field" id="input-location" type="text" placeholder="Ex: Boa Esperan&ccedil;a, MG" inputmode="text" autocomplete="address-level2">
           </div>
-          <button class="btn btn-primary" id="btn-search" disabled>&#128269; Buscar empresas</button>
+          <div class="slide-in-btn" id="search-btn-group">
+            <button class="btn btn-primary" id="btn-search" disabled>Buscar empresas</button>
+          </div>
 
           <div class="search-badge-row" style="display: none;">
             <span class="badge badge-green" id="search-badge">3 buscas restantes</span>
@@ -1368,7 +1410,7 @@
           </div>
 
           <div class="limit-actions">
-            <button class="btn btn-primary" onclick="showScreen('auth')">Assinar agora</button>
+            <button class="btn btn-primary" onclick="showScreen('auth')">Teste por 7 dias</button>
           </div>
         </div>
         <button class="limit-back" onclick="showScreen('search')">Voltar</button>
@@ -1394,21 +1436,49 @@
 
           <div class="auth-error" id="auth-error"></div>
 
-          <div class="input-group">
-            <label for="input-email">E-mail</label>
-            <input class="input-field" id="input-email" type="email" placeholder="seu@email.com" inputmode="email" autocomplete="email">
-          </div>
-          <div class="input-group" id="cpf-group">
-            <label for="input-cpf">CPF</label>
-            <input class="input-field" id="input-cpf" type="text" placeholder="000.000.000-00" inputmode="numeric" autocomplete="off" maxlength="14">
-          </div>
-          <div class="input-group">
-            <label for="input-password">Senha</label>
-            <input class="input-field" id="input-password" type="password" placeholder="M&iacute;nimo 6 caracteres" autocomplete="new-password" minlength="6">
+          <!-- Campo 1: Nome (sempre visível no signup) -->
+          <div class="input-group" id="auth-name-group">
+            <label for="input-name">Seu nome</label>
+            <input class="input-field" id="input-name" type="text" placeholder="Como podemos te chamar?" inputmode="text" autocomplete="name">
           </div>
 
-          <div class="auth-actions">
-            <button class="btn btn-primary" id="btn-auth" onclick="handleAuth()">Criar conta e assinar</button>
+          <!-- Campo 2: Email (aparece após digitar nome) -->
+          <div class="auth-field-group" id="auth-email-group">
+            <div class="input-group" style="margin-bottom:0;">
+              <label for="input-email">E-mail</label>
+              <input class="input-field" id="input-email" type="email" placeholder="seu@email.com" inputmode="email" autocomplete="email">
+            </div>
+          </div>
+
+          <!-- Campo 3: WhatsApp (aparece após digitar email) -->
+          <div class="auth-field-group" id="auth-whatsapp-group">
+            <div class="input-group" style="margin-bottom:0;">
+              <label for="input-whatsapp">WhatsApp</label>
+              <input class="input-field" id="input-whatsapp" type="tel" placeholder="(00) 00000-0000" inputmode="tel" autocomplete="tel" maxlength="15">
+            </div>
+          </div>
+
+          <!-- Campo 4: Senha (aparece após digitar WhatsApp) -->
+          <div class="auth-field-group" id="auth-password-group">
+            <div class="input-group" style="margin-bottom:0;">
+              <label for="input-password">Senha</label>
+              <input class="input-field" id="input-password" type="password" placeholder="M&iacute;nimo 6 caracteres" autocomplete="new-password" minlength="6">
+            </div>
+          </div>
+
+          <!-- Campo 5: CPF (aparece após digitar senha) -->
+          <div class="auth-field-group" id="auth-cpf-group">
+            <div class="input-group" style="margin-bottom:0;">
+              <label for="input-cpf">CPF</label>
+              <input class="input-field" id="input-cpf" type="text" placeholder="000.000.000-00" inputmode="numeric" autocomplete="off" maxlength="14">
+            </div>
+          </div>
+
+          <!-- Botão final (aparece após digitar CPF) -->
+          <div class="auth-field-group" id="auth-submit-group">
+            <div class="auth-actions" style="margin-top:0;">
+              <button class="btn btn-primary" id="btn-auth" onclick="handleAuth()">Criar conta e assinar</button>
+            </div>
           </div>
         </div>
 
@@ -1623,16 +1693,23 @@
       // Update state when showing screens
       if (name === 'search') {
         updateSearchBadge();
-        // Restaurar visibilidade do campo cidade se categoria já tem 3+ chars
+        // Restaurar visibilidade do campo cidade e botão se valores já preenchidos
         var catVal = document.getElementById('input-category').value.trim();
+        var locVal = document.getElementById('input-location').value.trim();
         var locGroup = document.getElementById('location-group');
         var locHint = document.getElementById('location-hint');
+        var searchBtnGroup = document.getElementById('search-btn-group');
         if (catVal.length >= 3) {
           locHint.classList.add('visible');
           locGroup.classList.add('visible');
         } else {
           locHint.classList.remove('visible');
           locGroup.classList.remove('visible');
+        }
+        if (catVal && locVal.length >= 2) {
+          searchBtnGroup.classList.add('visible');
+        } else {
+          searchBtnGroup.classList.remove('visible');
         }
       }
       if (name === 'results') {
@@ -1790,6 +1867,14 @@
       const cat = document.getElementById('input-category').value.trim();
       const loc = document.getElementById('input-location').value.trim();
       document.getElementById('btn-search').disabled = !(cat && loc);
+
+      // Mostrar botão de busca somente quando cidade é preenchida
+      var searchBtnGroup = document.getElementById('search-btn-group');
+      if (cat && loc.length >= 2) {
+        searchBtnGroup.classList.add('visible');
+      } else {
+        searchBtnGroup.classList.remove('visible');
+      }
     }
 
     document.getElementById('input-category').addEventListener('input', function() {
@@ -2025,13 +2110,110 @@
       authMode = mode;
       document.getElementById('tab-signup').classList.toggle('active', mode === 'signup');
       document.getElementById('tab-login').classList.toggle('active', mode === 'login');
-      document.getElementById('btn-auth').textContent = mode === 'signup' ? 'Criar conta e assinar' : 'Entrar';
       document.getElementById('auth-header-title').textContent = mode === 'signup' ? 'Criar conta' : 'Entrar';
       document.getElementById('input-password').autocomplete = mode === 'signup' ? 'new-password' : 'current-password';
-      // Mostrar/esconder campo CPF
-      document.getElementById('cpf-group').style.display = mode === 'signup' ? '' : 'none';
       hideAuthError();
+
+      if (mode === 'signup') {
+        // Signup: mostrar campo nome, esconder os progressivos
+        document.getElementById('auth-name-group').style.display = '';
+        // Resetar campos progressivos
+        ['auth-email-group', 'auth-whatsapp-group', 'auth-password-group', 'auth-cpf-group', 'auth-submit-group'].forEach(function(id) {
+          document.getElementById(id).classList.remove('visible', 'visible-large');
+        });
+        // Recalcular visibilidade baseado no que já está preenchido
+        updateAuthProgressive();
+      } else {
+        // Login: esconder campos de signup, mostrar apenas email + senha + botão
+        document.getElementById('auth-name-group').style.display = 'none';
+        document.getElementById('auth-email-group').classList.add('visible');
+        document.getElementById('auth-whatsapp-group').classList.remove('visible', 'visible-large');
+        document.getElementById('auth-password-group').classList.add('visible');
+        document.getElementById('auth-cpf-group').classList.remove('visible', 'visible-large');
+        document.getElementById('auth-submit-group').classList.add('visible');
+        document.getElementById('btn-auth').textContent = 'Entrar';
+      }
     }
+
+    // Formulário progressivo: desbloqueia campos um a um
+    function updateAuthProgressive() {
+      if (authMode !== 'signup') return;
+
+      var name = document.getElementById('input-name').value.trim();
+      var email = document.getElementById('input-email').value.trim();
+      var whatsapp = document.getElementById('input-whatsapp').value.replace(/\D/g, '');
+      var password = document.getElementById('input-password').value;
+      var cpf = document.getElementById('input-cpf').value.replace(/\D/g, '');
+
+      var emailGroup = document.getElementById('auth-email-group');
+      var whatsappGroup = document.getElementById('auth-whatsapp-group');
+      var passwordGroup = document.getElementById('auth-password-group');
+      var cpfGroup = document.getElementById('auth-cpf-group');
+      var submitGroup = document.getElementById('auth-submit-group');
+
+      // Nome >= 3 chars → mostra email
+      if (name.length >= 3) {
+        emailGroup.classList.add('visible');
+      } else {
+        emailGroup.classList.remove('visible');
+        whatsappGroup.classList.remove('visible');
+        passwordGroup.classList.remove('visible');
+        cpfGroup.classList.remove('visible');
+        submitGroup.classList.remove('visible');
+        return;
+      }
+
+      // Email tem @ → mostra WhatsApp
+      if (email.includes('@') && email.length >= 5) {
+        whatsappGroup.classList.add('visible');
+      } else {
+        whatsappGroup.classList.remove('visible');
+        passwordGroup.classList.remove('visible');
+        cpfGroup.classList.remove('visible');
+        submitGroup.classList.remove('visible');
+        return;
+      }
+
+      // WhatsApp >= 10 dígitos → mostra senha
+      if (whatsapp.length >= 10) {
+        passwordGroup.classList.add('visible');
+      } else {
+        passwordGroup.classList.remove('visible');
+        cpfGroup.classList.remove('visible');
+        submitGroup.classList.remove('visible');
+        return;
+      }
+
+      // Senha >= 6 chars → mostra CPF
+      if (password.length >= 6) {
+        cpfGroup.classList.add('visible');
+      } else {
+        cpfGroup.classList.remove('visible');
+        submitGroup.classList.remove('visible');
+        return;
+      }
+
+      // CPF >= 11 dígitos → mostra botão
+      if (cpf.length >= 11) {
+        submitGroup.classList.add('visible');
+        document.getElementById('btn-auth').textContent = 'Criar conta e assinar';
+      } else {
+        submitGroup.classList.remove('visible');
+      }
+    }
+
+    // Listeners para formulário progressivo
+    document.getElementById('input-name').addEventListener('input', updateAuthProgressive);
+    document.getElementById('input-email').addEventListener('input', updateAuthProgressive);
+    document.getElementById('input-whatsapp').addEventListener('input', function(e) {
+      // Máscara de telefone
+      var v = e.target.value.replace(/\D/g, '').substring(0, 11);
+      if (v.length > 6) v = v.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
+      else if (v.length > 2) v = v.replace(/(\d{2})(\d{0,5})/, '($1) $2');
+      e.target.value = v;
+      updateAuthProgressive();
+    });
+    document.getElementById('input-password').addEventListener('input', updateAuthProgressive);
 
     // Máscara de CPF
     document.getElementById('input-cpf').addEventListener('input', function(e) {
@@ -2040,6 +2222,7 @@
       else if (v.length > 6) v = v.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3');
       else if (v.length > 3) v = v.replace(/(\d{3})(\d{1,3})/, '$1.$2');
       e.target.value = v;
+      updateAuthProgressive();
     });
 
     function showAuthError(msg) {
@@ -2056,6 +2239,8 @@
       const email = document.getElementById('input-email').value.trim();
       const password = document.getElementById('input-password').value;
       const cpfRaw = document.getElementById('input-cpf').value.replace(/\D/g, '');
+      const nameVal = document.getElementById('input-name').value.trim();
+      const whatsappRaw = document.getElementById('input-whatsapp').value.replace(/\D/g, '');
 
       if (!email || !password) {
         showAuthError('Preencha todos os campos.');
@@ -2063,6 +2248,14 @@
       }
 
       if (authMode === 'signup') {
+        if (!nameVal) {
+          showAuthError('Informe seu nome.');
+          return;
+        }
+        if (whatsappRaw.length < 10) {
+          showAuthError('Informe um WhatsApp v\u00e1lido.');
+          return;
+        }
         if (cpfRaw.length !== 11) {
           showAuthError('Informe um CPF v\u00e1lido.');
           return;
@@ -2085,13 +2278,24 @@
 
       try {
         if (authMode === 'signup') {
-          const { data, error } = await sb.auth.signUp({ email, password });
+          const { data, error } = await sb.auth.signUp({
+            email,
+            password,
+            options: {
+              data: {
+                name: nameVal,
+                whatsapp: whatsappRaw
+              }
+            }
+          });
           if (error) throw error;
           currentUser = data.user;
-          await initUserProfile();
+          await initUserProfile(nameVal, whatsappRaw);
 
-          // Salvar CPF no localStorage pra usar na geração do PIX
+          // Salvar CPF e dados no localStorage pra usar na geração do PIX
           localStorage.setItem('ez_cpf', cpfRaw);
+          localStorage.setItem('ez_name', nameVal);
+          localStorage.setItem('ez_whatsapp', whatsappRaw);
 
           // Esconder formulário, mostrar seção PIX
           document.getElementById('auth-form-section').style.display = 'none';
@@ -2197,6 +2401,12 @@
       document.getElementById('auth-pix-generating').style.display = '';
       document.getElementById('auth-pix-generating').innerHTML = '<div class="spinner" style="margin: 0 auto 12px;"></div><p style="font-size: 14px; color: var(--text-muted);">Gerando PIX...</p>';
       document.getElementById('auth-qr-container').style.display = 'none';
+      // Resetar campos progressivos
+      document.getElementById('input-name').value = '';
+      document.getElementById('input-whatsapp').value = '';
+      ['auth-email-group', 'auth-whatsapp-group', 'auth-password-group', 'auth-cpf-group', 'auth-submit-group'].forEach(function(id) {
+        document.getElementById(id).classList.remove('visible', 'visible-large');
+      });
       document.getElementById('auth-pix-waiting').style.display = 'none';
       document.getElementById('auth-pix-steps').style.display = 'none';
       document.getElementById('auth-payment-success').classList.remove('visible');
@@ -2207,7 +2417,7 @@
     // =============================================
     // USER PROFILE
     // =============================================
-    async function initUserProfile() {
+    async function initUserProfile(name, whatsapp) {
       if (!currentUser) return;
       // Create profile with free searches carried over from localStorage
       const freeLeft = parseInt(localStorage.getItem('ez_searches_left') || '0', 10);
@@ -2220,14 +2430,17 @@
       };
 
       // Insert into Supabase (upsert)
-      await sb.from('users').upsert({
+      var upsertData = {
         id: currentUser.id,
         email: currentUser.email,
         searches_left: freeLeft,
         plan: 'free',
         template: template,
         created_at: new Date().toISOString()
-      });
+      };
+      if (name) upsertData.name = name;
+      if (whatsapp) upsertData.whatsapp = whatsapp;
+      await sb.from('users').upsert(upsertData);
     }
 
     async function fetchUserProfile() {
@@ -2612,6 +2825,7 @@
     window.closeExtrasModal = closeExtrasModal;
     window.generateAuthPix = generateAuthPix;
     window.resetAuthScreen = resetAuthScreen;
+    window.updateAuthProgressive = updateAuthProgressive;
 
     // Run init
     init();
