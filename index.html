@@ -280,7 +280,7 @@
     }
 
     .search-headline .hl-green {
-      color: var(--primary);
+      color: #0B8043;
     }
 
     .search-form {
@@ -1170,8 +1170,6 @@
           <div class="search-badge-row" style="display: none;">
             <span class="badge badge-green" id="search-badge">3 buscas restantes</span>
           </div>
-
-          <button class="btn btn-secondary" id="btn-history" style="display: none; margin-top: 24px;" onclick="loadLastResults()">&#128203; Ver &uacute;ltima busca</button>
         </div>
 
         <div class="search-footer"></div>
@@ -1530,7 +1528,6 @@
       // Update state when showing screens
       if (name === 'search') {
         updateSearchBadge();
-        updateHistoryBtnVisibility();
       }
       if (name === 'results') {
         updateResultsBadges();
@@ -1642,27 +1639,6 @@
       const b1 = document.getElementById('results-badge');
       b1.textContent = text;
       b1.className = cls;
-    }
-
-    function updateHistoryBtnVisibility() {
-      const btn = document.getElementById('btn-history');
-      const lastResults = localStorage.getItem('ez_last_results');
-      btn.style.display = lastResults ? '' : 'none';
-    }
-
-    function loadLastResults() {
-      try {
-        const saved = JSON.parse(localStorage.getItem('ez_last_results') || '{}');
-        if (saved.leads && saved.leads.length > 0) {
-          currentLeads = saved.leads;
-          currentCategory = saved.category || '';
-          currentLocation = saved.location || '';
-          renderResults(currentLeads);
-          showScreen('results');
-        }
-      } catch(e) {
-        console.error('Erro ao carregar histórico:', e);
-      }
     }
 
     function updateTemplateBar() {
@@ -2441,7 +2417,6 @@
 
       // Initialize search badge
       updateSearchBadge();
-      updateHistoryBtnVisibility();
 
       // Show search screen (already active by default)
       showScreen('search');
@@ -2454,13 +2429,11 @@
           currentUser = null;
           userProfile = null;
         }
-        updateHistoryBtnVisibility();
       });
     }
 
     // Expor funções pro escopo global (usadas em onclick no HTML)
     window.showScreen = showScreen;
-    window.loadLastResults = loadLastResults;
     window.toggleHideContacted = toggleHideContacted;
     window.handleWhatsAppClick = handleWhatsAppClick;
     window.goBackFromTemplate = goBackFromTemplate;
