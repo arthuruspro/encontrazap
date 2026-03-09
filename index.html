@@ -1163,6 +1163,166 @@
       color: var(--text-muted);
     }
 
+    /* ---- DISPATCH BAR ---- */
+    .dispatch-bar {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      background: #fff;
+      border-top: 2px solid var(--primary);
+      padding: 14px 20px;
+      z-index: 50;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.12);
+      display: none;
+      animation: slideUp 0.3s ease-out;
+    }
+
+    .dispatch-bar.visible {
+      display: block;
+    }
+
+    .dispatch-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .dispatch-progress-text {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .dispatch-close {
+      width: 28px;
+      height: 28px;
+      border: none;
+      background: #f3f4f6;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--text-muted);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .dispatch-lead-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .dispatch-lead-meta {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .dispatch-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .dispatch-wa-btn {
+      flex: 1;
+      height: 48px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
+      transition: transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .dispatch-wa-btn:active {
+      transform: scale(0.97);
+    }
+
+    .dispatch-skip-btn {
+      width: 48px;
+      height: 48px;
+      background: #f3f4f6;
+      border: none;
+      border-radius: 12px;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .dispatch-skip-btn:active {
+      background: #e5e7eb;
+    }
+
+    .dispatch-done {
+      text-align: center;
+      padding: 8px 0;
+    }
+
+    .dispatch-done-text {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--success);
+      margin-bottom: 8px;
+    }
+
+    .dispatch-done-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* Botão iniciar disparos na tela de resultados */
+    .btn-start-dispatch {
+      margin: 12px 16px 4px;
+      width: calc(100% - 32px);
+      height: 48px;
+      background: linear-gradient(135deg, var(--primary) 0%, #128C7E 100%);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(37, 211, 102, 0.25);
+      transition: transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn-start-dispatch:active {
+      transform: scale(0.97);
+    }
+
     /* ---- BUY EXTRAS MODAL ---- */
     .modal-overlay {
       position: fixed;
@@ -1437,6 +1597,17 @@
         </button>
       </div>
 
+      <!-- Botão de disparo sequencial (só aparece se tem leads não contactados) -->
+      <button class="btn-start-dispatch" id="btn-start-dispatch" onclick="startMassDispatch()" style="display:none;">
+        &#128640; Envio em massa com 1 clique
+      </button>
+
+      <!-- Banner para free users: upsell envio em massa -->
+      <div id="dispatch-upsell" style="display:none; margin:8px 16px 4px; padding:12px 16px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px; text-align:center;">
+        <p style="font-size:13px; color:var(--text-muted); margin-bottom:8px;">&#128274; Envio em massa n&atilde;o dispon&iacute;vel no plano gratuito</p>
+        <button onclick="showScreen('limit')" style="background:none; border:none; color:var(--primary-dark); font-weight:700; font-size:14px; cursor:pointer; font-family:inherit; padding:4px 0;">Ativar plano &rarr;</button>
+      </div>
+
       <div class="leads-list" id="leads-list"></div>
 
       <div class="all-contacted-banner" id="all-contacted-banner">
@@ -1444,6 +1615,31 @@
         <button class="btn btn-primary" onclick="showScreen('search')" style="margin-top:16px;padding:14px 32px;font-size:16px;">&#128269; Fazer nova busca</button>
       </div>
 
+    </div>
+
+    <!-- ==================== DISPATCH BAR (FIXED) ==================== -->
+    <div class="dispatch-bar" id="dispatch-bar">
+      <div class="dispatch-header">
+        <span class="dispatch-progress-text" id="dispatch-progress">1 de 20</span>
+        <button class="dispatch-close" onclick="stopDispatch()" title="Fechar">&#10005;</button>
+      </div>
+      <div id="dispatch-content">
+        <div class="dispatch-lead-name" id="dispatch-lead-name">Nome da empresa</div>
+        <div class="dispatch-lead-meta" id="dispatch-lead-meta">&#11088; 4.8 (120) &middot; Rua Exemplo</div>
+        <div class="dispatch-actions">
+          <a class="dispatch-wa-btn" id="dispatch-wa-btn" href="#" target="_blank" rel="noopener" onclick="dispatchSent()">
+            <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" fill="white"/></svg>
+            Abrir WhatsApp
+          </a>
+          <button class="dispatch-skip-btn" onclick="skipDispatch()" title="Pular">&#10140;</button>
+        </div>
+      </div>
+      <div id="dispatch-done-content" style="display:none;">
+        <div class="dispatch-done">
+          <div class="dispatch-done-text">&#127881; Todos enviados!</div>
+          <div class="dispatch-done-sub">Voc&ecirc; contactou todos os leads desta lista.</div>
+        </div>
+      </div>
     </div>
 
     <!-- ==================== TEMPLATE SCREEN ==================== -->
@@ -1503,7 +1699,7 @@
             </div>
             <div class="feature-item">
               <span class="feature-check">&#10003;</span>
-              <span>Envio em massa via WhatsApp</span>
+              <span>Envio em massa com 1 clique</span>
             </div>
             <div class="feature-item">
               <span class="feature-check">&#10003;</span>
@@ -1798,6 +1994,11 @@
       if (target) {
         target.classList.add('active');
       }
+      // Fechar dispatch bar se sair da tela de resultados
+      if (name !== 'results' && typeof stopDispatch === 'function') {
+        var dbar = document.getElementById('dispatch-bar');
+        if (dbar && dbar.classList.contains('visible')) stopDispatch();
+      }
       // Salvar tela atual pra persistir no refresh
       if (name === 'results' || name === 'search') {
         localStorage.setItem('ez_current_screen', name);
@@ -1831,6 +2032,7 @@
       if (name === 'results') {
         updateResultsBadges();
         updateTemplateBar();
+        if (typeof updateDispatchButtons === 'function') updateDispatchButtons();
       }
       if (name === 'template') {
         loadTemplateScreen();
@@ -2168,6 +2370,7 @@
 
       updateTemplateBar();
       checkAllContacted();
+      updateDispatchButtons();
     }
 
     function checkAllContacted() {
@@ -2997,6 +3200,141 @@
       });
     }
 
+    // =============================================
+    // MASS DISPATCH (SEQUENTIAL MODE)
+    // =============================================
+    var dispatchActive = false;
+    var dispatchIndex = 0;
+    var dispatchQueue = []; // leads não contactados
+
+    function buildDispatchQueue() {
+      var contacted = getContactedSet();
+      dispatchQueue = [];
+      currentLeads.forEach(function(lead, i) {
+        var phone = (lead.phone || '').replace(/\D/g, '');
+        if (!contacted.has(phone) && phone) {
+          dispatchQueue.push({ lead: lead, index: i });
+        }
+      });
+      return dispatchQueue;
+    }
+
+    function updateDispatchButtons() {
+      var startBtn = document.getElementById('btn-start-dispatch');
+      var upsellBanner = document.getElementById('dispatch-upsell');
+      if (!currentLeads || currentLeads.length === 0) {
+        startBtn.style.display = 'none';
+        upsellBanner.style.display = 'none';
+        return;
+      }
+
+      // Se free user: mostra upsell, esconde botão de disparo
+      if (!isPaidUser()) {
+        startBtn.style.display = 'none';
+        upsellBanner.style.display = '';
+        return;
+      }
+
+      // Paid user: mostra botão se tem leads não contactados
+      upsellBanner.style.display = 'none';
+      var queue = buildDispatchQueue();
+      if (queue.length > 0 && !dispatchActive) {
+        startBtn.style.display = '';
+      } else {
+        startBtn.style.display = 'none';
+      }
+    }
+
+    function startMassDispatch() {
+      buildDispatchQueue();
+      if (dispatchQueue.length === 0) {
+        alert('Todos os leads já foram contactados!');
+        return;
+      }
+      dispatchActive = true;
+      dispatchIndex = 0;
+      document.getElementById('btn-start-dispatch').style.display = 'none';
+      document.getElementById('dispatch-upsell').style.display = 'none';
+      showDispatchLead();
+      document.getElementById('dispatch-bar').classList.add('visible');
+      // Ajustar padding bottom do results pra não ficar atrás da barra
+      document.getElementById('screen-results').style.paddingBottom = '200px';
+    }
+
+    function showDispatchLead() {
+      if (dispatchIndex >= dispatchQueue.length) {
+        // Todos enviados
+        document.getElementById('dispatch-content').style.display = 'none';
+        document.getElementById('dispatch-done-content').style.display = '';
+        setTimeout(function() {
+          stopDispatch();
+        }, 3000);
+        return;
+      }
+
+      document.getElementById('dispatch-content').style.display = '';
+      document.getElementById('dispatch-done-content').style.display = 'none';
+
+      var item = dispatchQueue[dispatchIndex];
+      var lead = item.lead;
+      var phone = (lead.phone || '').replace(/\D/g, '');
+      var rating = parseFloat(lead.rating) || 0;
+
+      document.getElementById('dispatch-progress').textContent = (dispatchIndex + 1) + ' de ' + dispatchQueue.length;
+      document.getElementById('dispatch-lead-name').textContent = lead.name || 'Sem nome';
+
+      var metaParts = [];
+      if (rating > 0) metaParts.push('\u2b50 ' + rating.toFixed(1) + (lead.reviews ? ' (' + lead.reviews + ')' : ''));
+      if (lead.address) metaParts.push(lead.address);
+      document.getElementById('dispatch-lead-meta').textContent = metaParts.join(' \u00b7 ') || '';
+
+      document.getElementById('dispatch-wa-btn').href = getWaUrl(phone, lead.name);
+
+      // Scroll to current lead in the list
+      var leadEl = document.getElementById('lead-' + item.index);
+      if (leadEl) {
+        leadEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Highlight briefly
+        leadEl.style.boxShadow = '0 0 0 2px var(--primary)';
+        setTimeout(function() { leadEl.style.boxShadow = ''; }, 1500);
+      }
+    }
+
+    function dispatchSent() {
+      if (dispatchIndex >= dispatchQueue.length) return;
+      var item = dispatchQueue[dispatchIndex];
+      var phone = (item.lead.phone || '').replace(/\D/g, '');
+
+      // Marcar como contactado
+      markContacted(phone);
+      var leadEl = document.getElementById('lead-' + item.index);
+      if (leadEl) {
+        leadEl.classList.add('contacted');
+        if (hideContacted) leadEl.classList.add('hidden');
+      }
+      checkAllContacted();
+
+      // Avançar para próximo após um breve delay (dando tempo do WhatsApp abrir)
+      setTimeout(function() {
+        dispatchIndex++;
+        showDispatchLead();
+      }, 800);
+    }
+
+    function skipDispatch() {
+      dispatchIndex++;
+      showDispatchLead();
+    }
+
+    function stopDispatch() {
+      dispatchActive = false;
+      document.getElementById('dispatch-bar').classList.remove('visible');
+      document.getElementById('screen-results').style.paddingBottom = '80px';
+      document.getElementById('dispatch-content').style.display = '';
+      document.getElementById('dispatch-done-content').style.display = 'none';
+      updateDispatchButtons();
+    }
+
     // Expor funções pro escopo global (usadas em onclick no HTML)
     window.showScreen = showScreen;
     window.toggleHideContacted = toggleHideContacted;
@@ -3013,6 +3351,10 @@
     window.generateAuthPix = generateAuthPix;
     window.resetAuthScreen = resetAuthScreen;
     window.updateAuthProgressive = updateAuthProgressive;
+    window.startMassDispatch = startMassDispatch;
+    window.dispatchSent = dispatchSent;
+    window.skipDispatch = skipDispatch;
+    window.stopDispatch = stopDispatch;
 
     // Run init
     init();
