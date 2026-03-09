@@ -142,6 +142,20 @@
       margin-bottom: 10px;
     }
 
+    .slide-in-hint {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      margin-bottom: 0;
+      transition: max-height 0.35s ease, opacity 0.3s ease, margin-bottom 0.3s ease;
+    }
+
+    .slide-in-hint.visible {
+      max-height: 30px;
+      opacity: 1;
+      margin-bottom: 10px;
+    }
+
     .input-group label {
       display: block;
       font-size: 13px;
@@ -1183,8 +1197,9 @@
           <div class="input-group">
             <input class="input-field" id="input-category" type="text" placeholder="Ex: sal&atilde;o de beleza, cl&iacute;nicas, com&eacute;rcio..." inputmode="text" autocomplete="off">
           </div>
+          <p class="search-form-hint slide-in-hint" id="location-hint">Em qual cidade?</p>
           <div class="input-group slide-in" id="location-group">
-            <input class="input-field" id="input-location" type="text" placeholder="Cidade (ex: Boa Esperan&ccedil;a, MG)" inputmode="text" autocomplete="address-level2">
+            <input class="input-field" id="input-location" type="text" placeholder="Ex: Boa Esperan&ccedil;a, MG" inputmode="text" autocomplete="address-level2">
           </div>
           <button class="btn btn-primary" id="btn-search" disabled>&#128269; Buscar empresas</button>
 
@@ -1560,9 +1575,12 @@
         // Restaurar visibilidade do campo cidade se categoria já tem 3+ chars
         var catVal = document.getElementById('input-category').value.trim();
         var locGroup = document.getElementById('location-group');
+        var locHint = document.getElementById('location-hint');
         if (catVal.length >= 3) {
+          locHint.classList.add('visible');
           locGroup.classList.add('visible');
         } else {
+          locHint.classList.remove('visible');
           locGroup.classList.remove('visible');
         }
       }
@@ -1724,11 +1742,14 @@
       updateSearchBtn();
       var cat = document.getElementById('input-category').value.trim();
       var locationGroup = document.getElementById('location-group');
+      var locationHint = document.getElementById('location-hint');
       if (cat.length >= 3) {
         if (!locationGroup.classList.contains('visible')) {
+          locationHint.classList.add('visible');
           locationGroup.classList.add('visible');
         }
       } else {
+        locationHint.classList.remove('visible');
         locationGroup.classList.remove('visible');
       }
     });
