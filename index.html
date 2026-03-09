@@ -1711,7 +1711,7 @@
             <button class="btn btn-primary" onclick="showScreen('auth')">Teste por 7 dias</button>
           </div>
         </div>
-        <button class="limit-back" onclick="showScreen('search')">Voltar</button>
+        <button class="limit-back" onclick="goBack()">Voltar</button>
       </div>
     </div>
 
@@ -1988,6 +1988,13 @@
     // SCREEN MANAGEMENT
     // =============================================
     function showScreen(name) {
+      // Guardar tela anterior antes de trocar
+      var currentActive = document.querySelector('.screen.active');
+      if (currentActive) {
+        var currentId = currentActive.id.replace('screen-', '');
+        if (currentId !== name) previousScreen = currentId;
+      }
+
       const allScreens = document.querySelectorAll('.screen');
       allScreens.forEach(s => s.classList.remove('active'));
       const target = document.getElementById('screen-' + name);
@@ -3335,8 +3342,14 @@
       updateDispatchButtons();
     }
 
+    // Voltar pra tela anterior (usado nos botões "Voltar")
+    function goBack() {
+      showScreen(previousScreen || 'search');
+    }
+
     // Expor funções pro escopo global (usadas em onclick no HTML)
     window.showScreen = showScreen;
+    window.goBack = goBack;
     window.toggleHideContacted = toggleHideContacted;
     window.handleWhatsAppClick = handleWhatsAppClick;
     window.goBackFromTemplate = goBackFromTemplate;
