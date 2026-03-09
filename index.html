@@ -128,6 +128,20 @@
       margin-bottom: 10px;
     }
 
+    .input-group.slide-in {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      margin-bottom: 0;
+      transition: max-height 0.35s ease, opacity 0.3s ease, margin-bottom 0.3s ease;
+    }
+
+    .input-group.slide-in.visible {
+      max-height: 70px;
+      opacity: 1;
+      margin-bottom: 10px;
+    }
+
     .input-group label {
       display: block;
       font-size: 13px;
@@ -285,6 +299,13 @@
 
     .search-form {
       width: 100%;
+    }
+
+    .search-form-hint {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 10px;
     }
 
     .search-footer {
@@ -1158,10 +1179,11 @@
         <h1 class="search-headline">Encontre empresas na sua cidade e <span class="hl-green">chame no WhatsApp</span> com 1 clique</h1>
 
         <div class="search-form">
+          <p class="search-form-hint">Qual tipo de empresa voc&ecirc; quer encontrar?</p>
           <div class="input-group">
-            <input class="input-field" id="input-category" type="text" placeholder="Tipo de empresa (ex: sal&#227;o, com&#233;rcio...)" inputmode="text" autocomplete="off">
+            <input class="input-field" id="input-category" type="text" placeholder="Ex: sal&atilde;o de beleza, cl&iacute;nicas, com&eacute;rcio..." inputmode="text" autocomplete="off">
           </div>
-          <div class="input-group">
+          <div class="input-group slide-in" id="location-group">
             <input class="input-field" id="input-location" type="text" placeholder="Cidade (ex: Boa Esperan&ccedil;a, MG)" inputmode="text" autocomplete="address-level2">
           </div>
           <button class="btn btn-primary" id="btn-search" disabled>&#128269; Buscar empresas</button>
@@ -1535,6 +1557,14 @@
       // Update state when showing screens
       if (name === 'search') {
         updateSearchBadge();
+        // Restaurar visibilidade do campo cidade se categoria já tem 3+ chars
+        var catVal = document.getElementById('input-category').value.trim();
+        var locGroup = document.getElementById('location-group');
+        if (catVal.length >= 3) {
+          locGroup.classList.add('visible');
+        } else {
+          locGroup.classList.remove('visible');
+        }
       }
       if (name === 'results') {
         updateResultsBadges();
@@ -1690,7 +1720,18 @@
       document.getElementById('btn-search').disabled = !(cat && loc);
     }
 
-    document.getElementById('input-category').addEventListener('input', updateSearchBtn);
+    document.getElementById('input-category').addEventListener('input', function() {
+      updateSearchBtn();
+      var cat = document.getElementById('input-category').value.trim();
+      var locationGroup = document.getElementById('location-group');
+      if (cat.length >= 3) {
+        if (!locationGroup.classList.contains('visible')) {
+          locationGroup.classList.add('visible');
+        }
+      } else {
+        locationGroup.classList.remove('visible');
+      }
+    });
     document.getElementById('input-location').addEventListener('input', updateSearchBtn);
 
     // =============================================
