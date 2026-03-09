@@ -2107,8 +2107,11 @@
         document.getElementById('auth-pix-waiting').style.display = 'block';
         document.getElementById('auth-pix-steps').style.display = 'block';
 
-        // Start polling
-        startPaymentPolling(data.paymentId, function(success) {
+        // Start polling — PIX Automático usa authorizationId
+        var pollId = data.authorizationId
+          ? { authorizationId: data.authorizationId }
+          : data.paymentId;
+        startPaymentPolling(pollId, function(success) {
           if (success) {
             document.getElementById('auth-qr-container').style.display = 'none';
             document.getElementById('auth-pix-waiting').style.display = 'none';
@@ -2227,8 +2230,11 @@
         document.getElementById('sub-pix-steps').classList.add('visible');
         btn.style.display = 'none';
 
-        // Start polling
-        startPaymentPolling(data.paymentId, (success) => {
+        // Start polling — PIX Automático usa authorizationId
+        var subPollId = data.authorizationId
+          ? { authorizationId: data.authorizationId }
+          : data.paymentId;
+        startPaymentPolling(subPollId, (success) => {
           if (success) {
             document.getElementById('sub-qr-container').classList.remove('visible');
             document.getElementById('sub-pix-waiting').classList.remove('visible');
@@ -2262,8 +2268,16 @@
     // =============================================
     // PAYMENT POLLING
     // =============================================
-    function startPaymentPolling(paymentId, callback) {
+    function startPaymentPolling(idOrObj, callback) {
       if (pollingInterval) clearInterval(pollingInterval);
+
+      // Suporta tanto paymentId (string) quanto { authorizationId } (PIX Automático)
+      var pollBody;
+      if (typeof idOrObj === 'string') {
+        pollBody = { paymentId: idOrObj };
+      } else {
+        pollBody = idOrObj; // { authorizationId: '...' }
+      }
 
       pollingInterval = setInterval(async () => {
         try {
@@ -2275,13 +2289,13 @@
               'apikey': SUPABASE_ANON_KEY,
               'Authorization': 'Bearer ' + (session ? session.access_token : '')
             },
-            body: JSON.stringify({ paymentId: paymentId })
+            body: JSON.stringify(pollBody)
           });
 
           if (!resp.ok) return;
           const data = await resp.json();
 
-          if (data.status === 'CONFIRMED' || data.status === 'RECEIVED' || data.paid === true) {
+          if (data.paid === true || data.status === 'CONFIRMED' || data.status === 'RECEIVED' || data.status === 'ACTIVE') {
             clearInterval(pollingInterval);
             pollingInterval = null;
             callback(true);
