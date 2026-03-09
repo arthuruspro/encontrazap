@@ -168,10 +168,15 @@
       right: 14px;
       top: 50%;
       transform: translateY(-50%);
-      color: #9ca3af;
+      color: #b0b7c3;
       pointer-events: none;
       display: flex;
       align-items: center;
+      transition: color 0.2s;
+    }
+
+    .input-with-icon .input-field:focus ~ .input-icon-right {
+      color: var(--primary);
     }
 
     /* Progressive auth form */
@@ -205,20 +210,21 @@
 
     .input-field {
       width: 100%;
-      height: 52px;
+      height: 54px;
       border: 2px solid var(--border);
       border-radius: var(--radius);
       padding: 0 16px;
       font-size: 16px;
       font-family: inherit;
       color: var(--text);
-      background: #fff;
-      transition: border-color 0.2s;
+      background: #f9fafb;
+      transition: border-color 0.2s, background 0.2s;
       outline: none;
     }
 
     .input-field:focus {
       border-color: var(--primary);
+      background: #fff;
     }
 
     .input-field::placeholder {
@@ -257,12 +263,14 @@
     .btn-primary {
       background: var(--primary);
       color: #fff;
+      box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
     }
 
     .btn-primary:disabled {
       background: #d1d5db;
       cursor: not-allowed;
       transform: none;
+      box-shadow: none;
     }
 
     .btn-secondary {
@@ -308,42 +316,45 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 48px 24px 24px;
+      padding: 36px 24px 24px;
+      justify-content: flex-start;
     }
 
     .logo-row {
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 24px;
+      gap: 8px;
+      margin-bottom: 20px;
     }
 
     .logo-circle {
-      width: 36px;
-      height: 36px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
       background: linear-gradient(135deg, var(--primary), var(--primary-dark));
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
+      font-size: 15px;
       flex-shrink: 0;
-      box-shadow: 0 3px 10px rgba(37, 211, 102, 0.25);
+      box-shadow: 0 2px 8px rgba(37, 211, 102, 0.2);
     }
 
     .logo-name {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
       color: var(--text-muted);
+      letter-spacing: -0.3px;
     }
 
     .search-headline {
-      font-size: 26px;
+      font-size: 24px;
       font-weight: 800;
       color: var(--text);
-      line-height: 1.25;
-      margin-bottom: 28px;
+      line-height: 1.3;
+      margin-bottom: 32px;
       text-align: center;
+      letter-spacing: -0.5px;
     }
 
     .search-headline .hl-green {
@@ -355,9 +366,9 @@
     }
 
     .search-form-hint {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text-muted);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
       margin-bottom: 10px;
     }
 
@@ -1267,7 +1278,7 @@
       <div class="search-container">
         <div class="logo-row">
           <div class="logo-circle">
-            <span style="filter: grayscale(1) brightness(10); font-size: 16px;">&#128269;</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           </div>
           <span class="logo-name">EncontraZap</span>
         </div>
@@ -1379,7 +1390,7 @@
     <div class="screen" id="screen-limit">
       <div class="limit-container">
         <div class="limit-card">
-          <div class="limit-logo"><span style="filter: grayscale(1) brightness(10); font-size: 20px;">&#128269;</span></div>
+          <div class="limit-logo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
           <h2 class="limit-title">Suas buscas gr&aacute;tis acabaram!</h2>
           <p class="limit-subtitle">Continue encontrando empresas com o plano mensal</p>
 
