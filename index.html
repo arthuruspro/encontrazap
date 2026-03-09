@@ -1638,7 +1638,7 @@
       <div id="dispatch-done-content" style="display:none;">
         <div class="dispatch-done">
           <div class="dispatch-done-text">&#127881; Todos enviados!</div>
-          <div class="dispatch-done-sub">Voc&ecirc; contactou todos os leads desta lista.</div>
+          <div class="dispatch-done-sub">Voc&ecirc; contactou todos os contatos desta lista.</div>
         </div>
       </div>
     </div>
@@ -2319,7 +2319,7 @@
         showScreen('results');
       } catch (err) {
         console.error('Search error:', err);
-        alert('Erro ao encontrar leads: ' + (err.message || 'Tente novamente.'));
+        alert('Erro ao encontrar contatos: ' + (err.message || 'Tente novamente.'));
         showScreen('search');
       }
     }
@@ -2330,7 +2330,7 @@
     function renderResults(leads) {
       // Header
       document.getElementById('results-category').textContent = currentCategory;
-      document.getElementById('results-subtitle').textContent = currentLocation + ' \u00b7 ' + leads.length + ' lead' + (leads.length !== 1 ? 's' : '');
+      document.getElementById('results-subtitle').textContent = currentLocation + ' \u00b7 ' + leads.length + ' contato' + (leads.length !== 1 ? 's' : '');
 
       const list = document.getElementById('leads-list');
       list.innerHTML = '';
@@ -3127,7 +3127,7 @@
               <div class="history-location">${escapeHtml(item.location || '')}</div>
             </div>
             <div class="history-right">
-              <div class="history-leads">${item.leads_count || 0} leads</div>
+              <div class="history-leads">${item.leads_count || 0} contatos</div>
               <div class="history-date">${dateStr}</div>
             </div>
           `;
